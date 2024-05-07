@@ -1,6 +1,9 @@
 use clap::Parser;
-use std::process::exit;
+use std::{process::exit, sync::Arc};
 
+mod parser;
+mod pot;
+mod visitor;
 mod walker;
 
 /// Search for a pattern in a file and display the lines that contain it.
@@ -46,10 +49,13 @@ fn main() {
         exclude, path, output_folder, references_relative_to, default_domain
     );
 
+    let mut pot = Arc::new(pot::POT::new());
+
     match walker::find_ts_files(path, exclude) {
         Ok(entries) => {
             for entry in entries {
-                println!("{:?}", entry.path())
+                println!("{:?}", entry.path());
+                parser::parse_file(&entry.into_path(), &mut pot);
             }
         }
         Err(e) => {

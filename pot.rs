@@ -31,7 +31,7 @@ impl POT {
         }
     }
 
-    fn add_message(&mut self, domain: &str, message: POTMessageID, reference: &str) {
+    pub fn add_message(&mut self, domain: &str, message: POTMessageID, reference: &str) {
         let file = self
             .domains
             .entry(domain.to_string())
@@ -42,7 +42,7 @@ impl POT {
             .insert(reference.to_string());
     }
 
-    fn to_string(&self, domain: &str) -> String {
+    pub fn to_string(&self, domain: &str) -> String {
         let mut result = String::new();
         if let Some(file) = self.domains.get(domain) {
             for (message, references) in &file.messages {
@@ -81,7 +81,7 @@ impl POT {
 const MAX_LINE_LENGTH: usize = 80;
 
 fn format_message(msg: &str) -> std::string::String {
-    if (msg.len() > 80) {
+    if msg.len() > 80 {
         let mut result = String::new();
         result.push_str("\"\"\n");
         let mut line = String::new();
