@@ -5,7 +5,11 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
+indexmap = "2.2.6"
 
 [[bin]]
 name = "ts-gettext-extractor"
 path = "main.rs"
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"
