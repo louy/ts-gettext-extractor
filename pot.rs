@@ -32,7 +32,7 @@ impl POTFile {
 
 #[derive()]
 pub struct POT {
-    pub default_domain: String,
+    default_domain: String,
     domains: IndexMap<String, POTFile>,
 }
 impl POT {
@@ -43,10 +43,10 @@ impl POT {
         }
     }
 
-    pub fn add_message(&mut self, domain: Option<&str>, message: POTMessageID, reference: &str) {
+    pub fn add_message(&mut self, domain: Option<String>, message: POTMessageID, reference: String) {
         let file = self
             .domains
-            .entry(domain.unwrap_or(&self.default_domain).to_string())
+            .entry(domain.unwrap_or(self.default_domain.clone()).to_string())
             .or_insert_with(POTFile::new);
         file.messages
             .entry(message)
@@ -130,7 +130,7 @@ mod tests {
         pot.add_message(
             None,
             POTMessageID::Singular(None, "Hello, world!".to_string()),
-            "src/main.rs",
+            "src/main.rs".to_string(),
         );
         assert_eq!(
             pot.to_string(None),
@@ -147,7 +147,7 @@ msgstr ""
         pot.add_message(
             None,
             POTMessageID::Plural(None, "%d person".to_string(), "%d people".to_string()),
-            "src/main.rs",
+            "src/main.rs".to_string(),
         );
         assert_eq!(
             pot.to_string(None),
@@ -167,7 +167,7 @@ msgstr[1] ""
         pot.add_message(
             None,
             POTMessageID::Singular(Some("menu".to_string()), "File".to_string()),
-            "src/main.rs",
+            "src/main.rs".to_string(),
         );
         pot.add_message(
             None,
@@ -176,7 +176,7 @@ msgstr[1] ""
                 "%d file".to_string(),
                 "%d files".to_string(),
             ),
-            "src/main.rs",
+            "src/main.rs".to_string(),
         );
         assert_eq!(
             pot.to_string(None),
@@ -202,17 +202,17 @@ msgstr[1] ""
         pot.add_message(
             None,
             POTMessageID::Singular(None, "Hello, world!".to_string()),
-            "src/main.rs:1",
+            "src/main.rs:1".to_string(),
         );
         pot.add_message(
             None,
             POTMessageID::Singular(None, "Hello, world!".to_string()),
-            "src/main.rs:10",
+            "src/main.rs:10".to_string(),
         );
         pot.add_message(
             None,
             POTMessageID::Singular(None, "Hello, world!".to_string()),
-            "src/main.rs:10",
+            "src/main.rs:10".to_string(),
         );
         assert_eq!(
             pot.to_string(None),
@@ -231,7 +231,7 @@ msgstr ""
         pot.add_message(
             None,
             POTMessageID::Singular(None, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string()),
-            "src/main.rs",
+            "src/main.rs".to_string(),
         );
         assert_eq!(
             pot.to_string(None),

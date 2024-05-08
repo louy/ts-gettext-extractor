@@ -30,5 +30,9 @@ Options:
 
 - **`gettext`** or **`__`** — e.g. `__('String')`
 - **`ngettext`** or **`__n`** — e.g. `__n('1 item', '%n items', count)`
+- **`pgettext`** or **`__p`** — e.g. `__p('context', 'String')`
+- **`npgettext`** or **`__np`** — e.g. `__np('context', '1 item', '%n items', count)`
 - **`dgettext`** or **`__d`** — e.g. `__d('domain', 'String')`
 - **`dngettext`** or **`__dn`** — e.g. `__dn('domain', '1 item', '%n items', count)`
+- **`dpgettext`** or **`__dp`** — e.g. `__dp('domain', 'context', 'String')`
+- **`dnpgettext`** or **`__dnp`** — e.g. `__dnp('domain', 'context', '1 item', '%n items', count)`

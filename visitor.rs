@@ -40,7 +40,7 @@ impl Visit for GettextVisitor {
                                     self.pot.lock().unwrap().add_message(
                                         None,
                                         POTMessageID::Singular(None, value.to_string()),
-                                        &format_reference(&self.cm, span),
+                                        format_reference(&self.cm, span),
                                     );
                                 }
                                 _ => {}
@@ -64,7 +64,7 @@ impl Visit for GettextVisitor {
                                                 value1.to_string(),
                                                 value2.to_string(),
                                             ),
-                                            &format_reference(&self.cm, span),
+                                            format_reference(&self.cm, span),
                                         );
                                     }
                                     _ => {}
@@ -88,7 +88,7 @@ impl Visit for GettextVisitor {
                                                 Some(value1.to_string()),
                                                 value2.to_string(),
                                             ),
-                                            &format_reference(&self.cm, span),
+                                            format_reference(&self.cm, span),
                                         );
                                     }
                                     _ => {}
@@ -114,7 +114,111 @@ impl Visit for GettextVisitor {
                                                 value2.to_string(),
                                                 value3.to_string(),
                                             ),
-                                            &format_reference(&self.cm, span),
+                                            format_reference(&self.cm, span),
+                                        );
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                    "__d" | "dgettext" => {
+                        println!("Found call to: {:?}", sym);
+                        match &args[..2] {
+                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
+                                match (&expr1.deref(), &expr2.deref()) {
+                                    (
+                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                    ) => {
+                                        self.pot.lock().unwrap().add_message(
+                                            Some(value1.to_string()),
+                                            POTMessageID::Singular(None, value2.to_string()),
+                                            format_reference(&self.cm, span),
+                                        );
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                    "__dn" | "dngettext" => {
+                        println!("Found call to: {:?}", sym);
+                        match &args[..3] {
+                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
+                                match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
+                                    (
+                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value3, .. })),
+                                    ) => {
+                                        self.pot.lock().unwrap().add_message(
+                                            Some(value1.to_string()),
+                                            POTMessageID::Plural(
+                                                None,
+                                                value2.to_string(),
+                                                value3.to_string(),
+                                            ),
+                                            format_reference(&self.cm, span),
+                                        );
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                    "__dp" | "dpgettext" => {
+                        println!("Found call to: {:?}", sym);
+                        match &args[..3] {
+                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
+                                match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
+                                    (
+                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value3, .. })),
+                                    ) => {
+                                        self.pot.lock().unwrap().add_message(
+                                            Some(value1.to_string()),
+                                            POTMessageID::Singular(
+                                                Some(value2.to_string()),
+                                                value3.to_string(),
+                                            ),
+                                            format_reference(&self.cm, span),
+                                        );
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                    "__dnp" | "dnpgettext" => {
+                        println!("Found call to: {:?}", sym);
+                        match &args[..4] {
+                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }, ExprOrSpread { expr: expr4, .. }] => {
+                                match (
+                                    &expr1.deref(),
+                                    &expr2.deref(),
+                                    &expr3.deref(),
+                                    &expr4.deref(),
+                                ) {
+                                    (
+                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value3, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value4, .. })),
+                                    ) => {
+                                        self.pot.lock().unwrap().add_message(
+                                            Some(value1.to_string()),
+                                            POTMessageID::Plural(
+                                                Some(value2.to_string()),
+                                                value3.to_string(),
+                                                value4.to_string(),
+                                            ),
+                                            format_reference(&self.cm, span),
                                         );
                                     }
                                     _ => {}
