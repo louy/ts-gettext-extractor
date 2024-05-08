@@ -1,5 +1,7 @@
 use clap::Parser;
 use std::{
+    fs,
+    io::Write,
     process::exit,
     sync::{Arc, Mutex},
 };
@@ -65,5 +67,32 @@ fn main() {
             eprintln!("Error reading path: {}", e);
             exit(1)
         }
+    }
+
+    println!("Writing pot files to {:?}", output_folder);
+    fs::remove_dir_all(&output_folder).unwrap_or_default();
+    fs::create_dir(&output_folder).unwrap();
+
+    pot.lock()
+        .unwrap()
+        .domains
+        .iter()
+        .for_each(|(domain, pot_file)| {
+            let file_path = output_folder.join(format!("{}.pot", domain));
+            println!("Writing {:?}", file_path);
+            let mut file = std::fs::File::create(file_path).unwrap();
+            file.write_all(pot_file.to_string().as_bytes()).unwrap();
+        });
+}
+
+#[cfg(test)]
+mod tests {
+    use clap::CommandFactory;
+
+    use crate::Cli;
+
+    #[test]
+    fn verify_cmd() {
+        Cli::command().debug_assert();
     }
 }

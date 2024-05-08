@@ -23,42 +23,9 @@ pub struct POTFile {
     messages: IndexMap<POTMessageID, IndexSet<String>>,
 }
 impl POTFile {
-    pub fn new() -> Self {
-        Self {
-            messages: IndexMap::new(),
-        }
-    }
-}
-
-#[derive()]
-pub struct POT {
-    default_domain: String,
-    domains: IndexMap<String, POTFile>,
-}
-impl POT {
-    pub fn new(default_domain: impl Into<Option<String>>) -> Self {
-        Self {
-            default_domain: default_domain.into().unwrap_or("default".to_string()),
-            domains: IndexMap::new(),
-        }
-    }
-
-    pub fn add_message(&mut self, domain: Option<String>, message: POTMessageID, reference: String) {
-        let file = self
-            .domains
-            .entry(domain.unwrap_or(self.default_domain.clone()).to_string())
-            .or_insert_with(POTFile::new);
-        file.messages
-            .entry(message)
-            .or_insert_with(IndexSet::new)
-            .insert(reference.to_string());
-    }
-
-    #[allow(dead_code)]
-    pub fn to_string(&self, domain: Option<&str>) -> String {
+    pub fn to_string(&self) -> String {
         let mut result = String::new();
-        if let Some(file) = self.domains.get(domain.unwrap_or(&self.default_domain)) {
-            for (message, references) in &file.messages {
+            for (message, references) in &self.messages {
                 for reference in references {
                     result.push_str(&format!("#: {}\n", reference));
                 }
@@ -90,8 +57,48 @@ impl POT {
                     }
                 }
             }
-        }
         result
+    }
+}
+impl POTFile {
+    pub fn new() -> Self {
+        Self {
+            messages: IndexMap::new(),
+        }
+    }
+}
+
+#[derive()]
+pub struct POT {
+    default_domain: String,
+   pub domains: IndexMap<String, POTFile>,
+}
+impl POT {
+    pub fn new(default_domain: impl Into<Option<String>>) -> Self {
+        Self {
+            default_domain: default_domain.into().unwrap_or("default".to_string()),
+            domains: IndexMap::new(),
+        }
+    }
+
+    pub fn add_message(&mut self, domain: Option<String>, message: POTMessageID, reference: String) {
+        let file = self
+            .domains
+            .entry(domain.unwrap_or(self.default_domain.clone()).to_string())
+            .or_insert_with(POTFile::new);
+        file.messages
+            .entry(message)
+            .or_insert_with(IndexSet::new)
+            .insert(reference.to_string());
+    }
+
+    #[allow(dead_code)]
+    pub fn to_string(&self, domain: Option<&str>) -> Option<String> {
+        if let Some(file) = self.domains.get(domain.unwrap_or(&self.default_domain)) {
+            Some(file.to_string())
+        } else {
+            None
+        }
     }
 }
 
@@ -133,7 +140,7 @@ mod tests {
             "src/main.rs".to_string(),
         );
         assert_eq!(
-            pot.to_string(None),
+            pot.to_string(None).unwrap(),
             r#"#: src/main.rs
 msgid "Hello, world!"
 msgstr ""
@@ -150,7 +157,7 @@ msgstr ""
             "src/main.rs".to_string(),
         );
         assert_eq!(
-            pot.to_string(None),
+            pot.to_string(None).unwrap(),
             r#"#: src/main.rs
 msgid "%d person"
 msgid_plural "%d people"
@@ -179,7 +186,7 @@ msgstr[1] ""
             "src/main.rs".to_string(),
         );
         assert_eq!(
-            pot.to_string(None),
+            pot.to_string(None).unwrap(),
             r#"#: src/main.rs
 msgctxt "menu"
 msgid "File"
@@ -215,7 +222,7 @@ msgstr[1] ""
             "src/main.rs:10".to_string(),
         );
         assert_eq!(
-            pot.to_string(None),
+            pot.to_string(None).unwrap(),
             r#"#: src/main.rs:1
 #: src/main.rs:10
 msgid "Hello, world!"
@@ -234,7 +241,7 @@ msgstr ""
             "src/main.rs".to_string(),
         );
         assert_eq!(
-            pot.to_string(None),
+            pot.to_string(None).unwrap(),
             r#"#: src/main.rs
 msgid ""
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "

@@ -1,0 +1,9 @@
+#: ./tests/src/index.jsx:11
+msgid "Today is your lucky day!"
+msgstr ""
+
+#: ./tests/src/index.jsx:12
+msgctxt "You won 1 coffee."
+msgid "You won %d coffees."
+msgstr ""
+

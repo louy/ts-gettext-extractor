@@ -254,7 +254,7 @@ mod tests {
         let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
         parse("test.js", r#"__("Hello, world!");"#, Arc::clone(&pot));
         assert_eq!(
-            pot.lock().unwrap().to_string(None),
+            pot.lock().unwrap().to_string(None).unwrap(),
             r#"#: test.js:1
 msgid "Hello, world!"
 msgstr ""
@@ -268,7 +268,7 @@ msgstr ""
         let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
         parse("test.js", r#"__n("1 file", "%d files");"#, Arc::clone(&pot));
         assert_eq!(
-            pot.lock().unwrap().to_string(None),
+            pot.lock().unwrap().to_string(None).unwrap(),
             r#"#: test.js:1
 msgid "1 file"
 msgid_plural "%d files"
@@ -288,7 +288,7 @@ msgstr[1] ""
             Arc::clone(&pot),
         );
         assert_eq!(
-            pot.lock().unwrap().to_string(None),
+            pot.lock().unwrap().to_string(None).unwrap(),
             r#"#: test.js:1
 msgctxt "menu"
 msgid "Hello, world!"
@@ -307,7 +307,7 @@ msgstr ""
             Arc::clone(&pot),
         );
         assert_eq!(
-            pot.lock().unwrap().to_string(None),
+            pot.lock().unwrap().to_string(None).unwrap(),
             r#"#: test.js:1
 msgctxt "menu"
 msgid "1 file"
