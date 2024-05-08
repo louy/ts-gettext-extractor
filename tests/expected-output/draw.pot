@@ -1,8 +1,8 @@
-#: ./tests/src/index.jsx:11
+#: ./tests/src/index.jsx:14
 msgid "Today is your lucky day!"
 msgstr ""
 
-#: ./tests/src/index.jsx:12
+#: ./tests/src/index.jsx:15
 msgctxt "You won 1 coffee."
 msgid "You won %d coffees."
 msgstr ""

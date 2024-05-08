@@ -1,3 +1,6 @@
+// To update snapshots, run:
+// cargo run -- --path ./tests/src/ --output-folder ./tests/expected-output/
+
 export const App = () => {
   const number = useMemo(() => Math.round(10 * Math.random()), []);
   return (

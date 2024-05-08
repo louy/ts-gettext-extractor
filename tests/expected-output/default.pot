@@ -1,9 +1,9 @@
-#: ./tests/src/index.jsx:6
+#: ./tests/src/index.jsx:9
 msgctxt "title"
 msgid "App"
 msgstr ""
 
-#: ./tests/src/index.jsx:9
+#: ./tests/src/index.jsx:12
 msgid ""
 "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium "
 "doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore "

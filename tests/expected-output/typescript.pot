@@ -1,0 +1,4 @@
+#: ./tests/src/test.ts:3
+msgid "Hello there!"
+msgstr ""
+
