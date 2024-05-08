@@ -42,7 +42,10 @@ struct Cli {
 
 fn main() {
     let args = Cli::parse();
+    run(args)
+}
 
+fn run(args: Cli) {
     let default_domain = args.default_domain;
     let exclude = args.exclude;
     let path = args.path.unwrap_or(std::path::PathBuf::from("."));
@@ -87,12 +90,48 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use clap::CommandFactory;
+    use std::fs::File;
 
-    use crate::Cli;
+    use clap::{CommandFactory, Parser};
+    use pretty_assertions::assert_eq;
+    use walkdir::WalkDir;
+
+    use crate::*;
 
     #[test]
     fn verify_cmd() {
         Cli::command().debug_assert();
+    }
+
+    #[test]
+    fn verify_snapshot() {
+        let args = Cli::parse_from([
+            "",
+            "--path",
+            "./tests/src/",
+            "--output-folder",
+            "./tests/output/",
+        ]);
+        run(args);
+        for entry in WalkDir::new(&"./tests/output/")
+            .into_iter()
+            .filter_map(|entry| entry.ok())
+            .filter(|entry| {
+                entry
+                    .metadata()
+                    .ok()
+                    .map(|metadata| metadata.is_file())
+                    .unwrap_or(false)
+            })
+        {
+            println!("{:?}", entry.path());
+            let actual = fs::read_to_string(entry.path()).unwrap();
+            let expected = fs::read_to_string(format!(
+                "./tests/expected-output/{}",
+                entry.file_name().to_str().unwrap()
+            ))
+            .unwrap();
+            assert_eq!(actual, expected);
+        }
     }
 }
