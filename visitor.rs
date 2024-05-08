@@ -40,7 +40,7 @@ impl Visit for GettextVisitor {
                                 Expr::Lit(Lit::Str(Str { value, .. })) => {
                                     self.pot.lock().unwrap().add_message(
                                         None,
-                                        POTMessageID::Singular(value.to_string()),
+                                        POTMessageID::Singular(None, value.to_string()),
                                         &format_reference(&self.cm, span),
                                     );
                                 }
@@ -61,6 +61,7 @@ impl Visit for GettextVisitor {
                                         self.pot.lock().unwrap().add_message(
                                             None,
                                             POTMessageID::Plural(
+                                                None,
                                                 value1.to_string(),
                                                 value2.to_string(),
                                             ),

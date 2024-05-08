@@ -2,10 +2,20 @@ use indexmap::{IndexMap, IndexSet};
 
 #[derive(Debug, Eq, Hash, PartialEq)]
 pub enum POTMessageID {
-    Singular(String),
-    Plural(String, String),
-    SingularWithContext(String, String),
-    PluralWithContext(String, String, String),
+    Singular(
+        /// Context
+        Option<String>,
+        /// msgid
+        String,
+    ),
+    Plural(
+        /// Context
+        Option<String>,
+        /// msgid
+        String,
+        /// msgid_plural
+        String,
+    ),
 }
 
 #[derive()]
@@ -52,26 +62,30 @@ impl POT {
                     result.push_str(&format!("#: {}\n", reference));
                 }
                 match message {
-                    POTMessageID::Singular(msg) => {
+                    POTMessageID::Singular(None, msg) => {
                         result.push_str(&format!("msgid {}\nmsgstr \"\"\n\n", format_message(msg)));
                     }
-                    POTMessageID::Plural(msg1, msg2) => {
+                    POTMessageID::Plural(None, msg1, msg2) => {
                         result.push_str(&format!(
                             "msgid {}\nmsgid_plural {}\nmsgstr[0] \"\"\nmsgstr[1] \"\"\n\n",
                             format_message(msg1),
                             format_message(msg2)
                         ));
                     }
-                    POTMessageID::SingularWithContext(ctx, msg) => {
+                    POTMessageID::Singular(Some(ctx), msg) => {
                         result.push_str(&format!(
                             "msgctxt \"{}\"\nmsgid {}\nmsgstr \"\"\n\n",
                             ctx,
                             format_message(msg)
                         ));
                     }
-                    POTMessageID::PluralWithContext(ctx, msg1, msg2) => {
-                        result.push_str(&format!("msgctxt \"{}\"\nmsgid {}\nmsgid_plural {}\nmsgstr[0] \"\"\nmsgstr[1] \"\"\n\n",  ctx, format_message(msg1),
-                        format_message( msg2)));
+                    POTMessageID::Plural(Some(ctx), msg1, msg2) => {
+                        result.push_str(&format!(
+                            "msgctxt \"{}\"\nmsgid {}\nmsgid_plural {}\nmsgstr[0] \"\"\nmsgstr[1] \"\"\n\n", 
+                            ctx, 
+                            format_message(msg1),
+                            format_message(msg2)
+                        ));
                     }
                 }
             }
@@ -114,7 +128,7 @@ mod tests {
         let mut pot = POT::new(None);
         pot.add_message(
             None,
-            POTMessageID::Singular("Hello, world!".to_string()),
+            POTMessageID::Singular(None, "Hello, world!".to_string()),
             "src/main.rs",
         );
         assert_eq!(
@@ -131,7 +145,7 @@ msgstr ""
         let mut pot = POT::new(None);
         pot.add_message(
             None,
-            POTMessageID::Plural("%d person".to_string(), "%d people".to_string()),
+            POTMessageID::Plural(None, "%d person".to_string(), "%d people".to_string()),
             "src/main.rs",
         );
         assert_eq!(
@@ -151,13 +165,13 @@ msgstr[1] ""
         let mut pot = POT::new(None);
         pot.add_message(
             None,
-            POTMessageID::SingularWithContext("menu".to_string(), "File".to_string()),
+            POTMessageID::Singular(Some("menu".to_string()), "File".to_string()),
             "src/main.rs",
         );
         pot.add_message(
             None,
-            POTMessageID::PluralWithContext(
-                "menu".to_string(),
+            POTMessageID::Plural(
+                Some("menu".to_string()),
                 "%d file".to_string(),
                 "%d files".to_string(),
             ),
@@ -186,17 +200,17 @@ msgstr[1] ""
         let mut pot = POT::new(None);
         pot.add_message(
             None,
-            POTMessageID::Singular("Hello, world!".to_string()),
+            POTMessageID::Singular(None, "Hello, world!".to_string()),
             "src/main.rs:1",
         );
         pot.add_message(
             None,
-            POTMessageID::Singular("Hello, world!".to_string()),
+            POTMessageID::Singular(None, "Hello, world!".to_string()),
             "src/main.rs:10",
         );
         pot.add_message(
             None,
-            POTMessageID::Singular("Hello, world!".to_string()),
+            POTMessageID::Singular(None, "Hello, world!".to_string()),
             "src/main.rs:10",
         );
         assert_eq!(
@@ -215,7 +229,7 @@ msgstr ""
         let mut pot = POT::new(None);
         pot.add_message(
             None,
-            POTMessageID::Singular("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string()),
+            POTMessageID::Singular(None, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string()),
             "src/main.rs",
         );
         assert_eq!(
