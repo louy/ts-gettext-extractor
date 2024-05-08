@@ -1,13 +1,12 @@
 use std::{
-    borrow::BorrowMut,
-    ops::{Deref, DerefMut},
+    ops::Deref,
     sync::{Arc, Mutex},
 };
 
-use swc_common::{sync::Lrc, FileName};
+use swc_common::sync::Lrc;
 use swc_common::{SourceMap, Span};
 use swc_ecma_ast::*;
-use swc_ecma_visit::{noop_visit_type, Visit, VisitWith};
+use swc_ecma_visit::{noop_visit_type, Visit};
 
 use crate::pot::POTMessageID;
 
@@ -31,7 +30,7 @@ impl Visit for GettextVisitor {
                 Expr::Ident(Ident {
                     span,
                     sym,
-                    optional,
+                    optional: _,
                 }) => match sym.as_str() {
                     "__" | "gettext" => {
                         println!("Found call to: {:?}", sym);
@@ -141,6 +140,7 @@ fn format_reference(cm: &Lrc<SourceMap>, span: &Span) -> String {
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
+    use swc_common::FileName;
     use swc_ecma_parser::{lexer::Lexer, Parser, StringInput};
 
     use super::*;
@@ -214,6 +214,8 @@ msgstr[1] ""
 "#
         );
     }
+
+    use swc_ecma_visit::VisitWith;
 
     fn parse(filename: &str, source: &str, pot: Arc<Mutex<crate::pot::POT>>) {
         let cm: Lrc<SourceMap> = Default::default();

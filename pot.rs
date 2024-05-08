@@ -54,6 +54,7 @@ impl POT {
             .insert(reference.to_string());
     }
 
+    #[allow(dead_code)]
     pub fn to_string(&self, domain: Option<&str>) -> String {
         let mut result = String::new();
         if let Some(file) = self.domains.get(domain.unwrap_or(&self.default_domain)) {
