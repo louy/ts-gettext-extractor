@@ -9,7 +9,7 @@ mod pot;
 mod visitor;
 mod walker;
 
-/// Search for a pattern in a file and display the lines that contain it.
+/// Generate Gettext template files from Javascript/Typescript code.
 #[derive(Parser)]
 struct Cli {
     /// A list of patterns to exclude
