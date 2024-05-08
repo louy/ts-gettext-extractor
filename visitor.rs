@@ -4,6 +4,8 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use swc_common::{sync::Lrc, FileName};
+use swc_common::{SourceMap, Span};
 use swc_ecma_ast::*;
 use swc_ecma_visit::{noop_visit_type, Visit, VisitWith};
 
@@ -11,6 +13,7 @@ use crate::pot::POTMessageID;
 
 pub struct GettextVisitor {
     pub pot: Arc<Mutex<crate::pot::POT>>,
+    pub cm: Lrc<SourceMap>,
 }
 impl Visit for GettextVisitor {
     noop_visit_type!();
@@ -24,69 +27,69 @@ impl Visit for GettextVisitor {
                 callee: Callee::Expr(expr),
                 args,
                 ..
-            } => {
-                match &expr.deref() {
-                    Expr::Ident(Ident {
-                        span,
-                        sym,
-                        optional,
-                    }) => match sym.as_str() {
-                        "__" | "gettext" => {
-                            println!("Found call to: {:?}", sym);
-                            match &args[..1] {
-                                [ExprOrSpread { expr, .. }] => match &expr.deref() {
-                                    Expr::Lit(Lit::Str(Str { value, .. })) => {
+            } => match &expr.deref() {
+                Expr::Ident(Ident {
+                    span,
+                    sym,
+                    optional,
+                }) => match sym.as_str() {
+                    "__" | "gettext" => {
+                        println!("Found call to: {:?}", sym);
+                        match &args[..1] {
+                            [ExprOrSpread { expr, .. }] => match &expr.deref() {
+                                Expr::Lit(Lit::Str(Str { value, .. })) => {
+                                    self.pot.lock().unwrap().add_message(
+                                        None,
+                                        POTMessageID::Singular(value.to_string()),
+                                        &format_reference(&self.cm, span),
+                                    );
+                                }
+                                _ => {}
+                            },
+                            _ => {}
+                        }
+                    }
+                    "__n" | "ngettext" => {
+                        println!("Found call to: {:?}", sym);
+                        match &args[..2] {
+                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
+                                match (&expr1.deref(), &expr2.deref()) {
+                                    (
+                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                    ) => {
                                         self.pot.lock().unwrap().add_message(
                                             None,
-                                            POTMessageID::Singular(value.to_string()),
-                                            "src/main.js", // FIXME - Loc
+                                            POTMessageID::Plural(
+                                                value1.to_string(),
+                                                value2.to_string(),
+                                            ),
+                                            &format_reference(&self.cm, span),
                                         );
                                     }
                                     _ => {}
-                                },
-                                _ => {}
-                            }
-                        }
-                        "__n" | "ngettext" => {
-                            println!("Found call to: {:?}", sym);
-                            match &args[..2] {
-                                [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] =>
-                                {
-                                    match (&expr1.deref(), &expr2.deref()) {
-                                        (
-                                            Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                            Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                        ) => {
-                                            self.pot.lock().unwrap().add_message(
-                                                None,
-                                                POTMessageID::Plural(
-                                                    value1.to_string(),
-                                                    value2.to_string(),
-                                                ),
-                                                "src/main.js", // FIXME - Loc
-                                            );
-                                        }
-                                        _ => {}
-                                    }
                                 }
-                                _ => {}
                             }
+                            _ => {}
                         }
-                        _ => {}
-                    },
+                    }
                     _ => {}
-                }
-            }
+                },
+                _ => {}
+            },
             _ => {}
         }
     }
 }
 
+fn format_reference(cm: &Lrc<SourceMap>, span: &Span) -> String {
+    let loc = cm.lookup_char_pos(span.lo);
+    format!("{}:{}", &loc.file.name.to_string(), loc.line.to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
-    use swc_common::SourceMap;
-    use swc_common::{sync::Lrc, FileName};
     use swc_ecma_parser::{lexer::Lexer, Parser, StringInput};
 
     use super::*;
@@ -97,7 +100,7 @@ mod tests {
         parse("test.js", r#"__("Hello, world!");"#, Arc::clone(&pot));
         assert_eq!(
             pot.lock().unwrap().to_string(None),
-            r#"#: test.js
+            r#"#: test.js:1
 msgid "Hello, world!"
 msgstr ""
 
@@ -111,7 +114,7 @@ msgstr ""
         parse("test.js", r#"__n("1 file", "%d files");"#, Arc::clone(&pot));
         assert_eq!(
             pot.lock().unwrap().to_string(None),
-            r#"#: test.js
+            r#"#: test.js:1
 msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
@@ -122,12 +125,14 @@ msgstr[1] ""
     }
 
     fn parse(filename: &str, source: &str, pot: Arc<Mutex<crate::pot::POT>>) {
-        let mut visitor = GettextVisitor { pot };
         let cm: Lrc<SourceMap> = Default::default();
+        let mut visitor = GettextVisitor {
+            pot,
+            cm: Lrc::clone(&cm),
+        };
         let fm = cm.new_source_file(FileName::Custom(filename.into()), source.into());
         let lexer = Lexer::new(
             Default::default(),
-            // EsVersion defaults to es5
             Default::default(),
             StringInput::from(&*fm),
             None,

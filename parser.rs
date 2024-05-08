@@ -63,7 +63,10 @@ pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
         })
         .expect("failed to parser module");
 
-    let mut visitor = crate::visitor::GettextVisitor { pot: pot };
+    let mut visitor = crate::visitor::GettextVisitor {
+        pot: pot,
+        cm: Lrc::clone(&cm),
+    };
 
     module.visit_with(&mut visitor);
 }
