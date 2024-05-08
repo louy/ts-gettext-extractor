@@ -25,27 +25,50 @@ impl Fold for GettextVisitor {
                 args,
                 ..
             } => {
-                println!("{:?}", args);
                 match &expr.deref() {
                     Expr::Ident(Ident {
                         span,
                         sym,
                         optional,
                     }) => match sym.as_str() {
-                        "__" => {
+                        "__" | "gettext" => {
                             println!("Found call to: {:?}", sym);
-                            match args.first() {
-                                Some(ExprOrSpread { expr, .. }) => match &expr.deref() {
+                            match &args[..1] {
+                                [ExprOrSpread { expr, .. }] => match &expr.deref() {
                                     Expr::Lit(Lit::Str(Str { value, .. })) => {
-                                        println!("Found string: {:?}", value);
                                         self.pot.lock().unwrap().add_message(
                                             None,
                                             POTMessageID::Singular(value.to_string()),
-                                            "src/main.js",
+                                            "src/main.js", // FIXME - Loc
                                         );
                                     }
                                     _ => {}
                                 },
+                                _ => {}
+                            }
+                        }
+                        "__n" | "ngettext" => {
+                            println!("Found call to: {:?}", sym);
+                            match &args[..2] {
+                                [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] =>
+                                {
+                                    match (&expr1.deref(), &expr2.deref()) {
+                                        (
+                                            Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                            Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                        ) => {
+                                            self.pot.lock().unwrap().add_message(
+                                                None,
+                                                POTMessageID::Plural(
+                                                    value1.to_string(),
+                                                    value2.to_string(),
+                                                ),
+                                                "src/main.js", // FIXME - Loc
+                                            );
+                                        }
+                                        _ => {}
+                                    }
+                                }
                                 _ => {}
                             }
                         }
@@ -89,6 +112,22 @@ mod tests {
             r#"#: src/main.js
 msgid "Hello, world!"
 msgstr ""
+
+"#
+        );
+    }
+
+    #[test]
+    fn detects_plural_message_with_no_context() {
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse("test.js", r#"__n("1 file", "%d files");"#, Arc::clone(&pot));
+        assert_eq!(
+            pot.lock().unwrap().to_string(None),
+            r#"#: src/main.js
+msgid "1 file"
+msgid_plural "%d files"
+msgstr[0] ""
+msgstr[1] ""
 
 "#
         );
