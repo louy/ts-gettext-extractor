@@ -8,7 +8,7 @@ use swc_common::{
     SourceMap,
 };
 use swc_ecma_parser::{lexer::Lexer, EsConfig, Parser, StringInput, Syntax, TsConfig};
-use swc_ecma_visit::FoldWith;
+use swc_ecma_visit::VisitWith;
 
 pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
     let syntax = match path.extension() {
@@ -65,7 +65,5 @@ pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
 
     let mut visitor = crate::visitor::GettextVisitor { pot: pot };
 
-    module.fold_with(&mut visitor);
-
-    // println!("{:?}", _module);
+    module.visit_with(&mut visitor);
 }

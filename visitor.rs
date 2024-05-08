@@ -5,18 +5,18 @@ use std::{
 };
 
 use swc_ecma_ast::*;
-use swc_ecma_visit::{noop_fold_type, Fold, FoldWith};
+use swc_ecma_visit::{noop_visit_type, Visit, VisitWith};
 
 use crate::pot::POTMessageID;
 
 pub struct GettextVisitor {
     pub pot: Arc<Mutex<crate::pot::POT>>,
 }
-impl Fold for GettextVisitor {
-    noop_fold_type!();
+impl Visit for GettextVisitor {
+    noop_visit_type!();
 
-    fn fold_call_expr(&mut self, call: CallExpr) -> CallExpr {
-        let call = call.fold_children_with(self);
+    fn visit_call_expr(&mut self, call: &CallExpr) {
+        // let call = call.visit_children_with(self);
         println!("{:?}", call);
 
         match &call {
@@ -79,18 +79,6 @@ impl Fold for GettextVisitor {
             }
             _ => {}
         }
-
-        call
-    }
-
-    fn fold_fn_expr(&mut self, f: FnExpr) -> FnExpr {
-        let f = f.fold_children_with(self);
-
-        if let Some(id) = &f.ident {
-            println!("Found function: {}", id.sym);
-        }
-
-        f
     }
 }
 
@@ -109,7 +97,7 @@ mod tests {
         parse("test.js", r#"__("Hello, world!");"#, Arc::clone(&pot));
         assert_eq!(
             pot.lock().unwrap().to_string(None),
-            r#"#: src/main.js
+            r#"#: test.js
 msgid "Hello, world!"
 msgstr ""
 
@@ -123,7 +111,7 @@ msgstr ""
         parse("test.js", r#"__n("1 file", "%d files");"#, Arc::clone(&pot));
         assert_eq!(
             pot.lock().unwrap().to_string(None),
-            r#"#: src/main.js
+            r#"#: test.js
 msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
@@ -146,6 +134,6 @@ msgstr[1] ""
         );
         let mut parser = Parser::new_from(lexer);
         let module = parser.parse_module().unwrap();
-        module.fold_with(&mut visitor);
+        module.visit_with(&mut visitor);
     }
 }
