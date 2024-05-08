@@ -74,6 +74,56 @@ impl Visit for GettextVisitor {
                             _ => {}
                         }
                     }
+                    "__p" | "pgettext" => {
+                        println!("Found call to: {:?}", sym);
+                        match &args[..2] {
+                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
+                                match (&expr1.deref(), &expr2.deref()) {
+                                    (
+                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                    ) => {
+                                        self.pot.lock().unwrap().add_message(
+                                            None,
+                                            POTMessageID::Singular(
+                                                Some(value1.to_string()),
+                                                value2.to_string(),
+                                            ),
+                                            &format_reference(&self.cm, span),
+                                        );
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                    "__np" | "npgettext" => {
+                        println!("Found call to: {:?}", sym);
+                        match &args[..3] {
+                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
+                                match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
+                                    (
+                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                        Expr::Lit(Lit::Str(Str { value: value3, .. })),
+                                    ) => {
+                                        self.pot.lock().unwrap().add_message(
+                                            None,
+                                            POTMessageID::Plural(
+                                                Some(value1.to_string()),
+                                                value2.to_string(),
+                                                value3.to_string(),
+                                            ),
+                                            &format_reference(&self.cm, span),
+                                        );
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
                     _ => {}
                 },
                 _ => {}
@@ -116,6 +166,46 @@ msgstr ""
         assert_eq!(
             pot.lock().unwrap().to_string(None),
             r#"#: test.js:1
+msgid "1 file"
+msgid_plural "%d files"
+msgstr[0] ""
+msgstr[1] ""
+
+"#
+        );
+    }
+
+    #[test]
+    fn detects_singular_message_with_context() {
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse(
+            "test.js",
+            r#"__p("menu", "Hello, world!");"#,
+            Arc::clone(&pot),
+        );
+        assert_eq!(
+            pot.lock().unwrap().to_string(None),
+            r#"#: test.js:1
+msgctxt "menu"
+msgid "Hello, world!"
+msgstr ""
+
+"#
+        );
+    }
+
+    #[test]
+    fn detects_plural_message_with_context() {
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse(
+            "test.js",
+            r#"__np("menu", "1 file", "%d files");"#,
+            Arc::clone(&pot),
+        );
+        assert_eq!(
+            pot.lock().unwrap().to_string(None),
+            r#"#: test.js:1
+msgctxt "menu"
 msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
