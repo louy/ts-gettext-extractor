@@ -1,5 +1,8 @@
 use clap::Parser;
-use std::{process::exit, sync::Arc};
+use std::{
+    process::exit,
+    sync::{Arc, Mutex},
+};
 
 mod parser;
 mod pot;
@@ -49,13 +52,13 @@ fn main() {
         exclude, path, output_folder, references_relative_to, default_domain
     );
 
-    let mut pot = Arc::new(pot::POT::new());
+    let pot = Arc::new(Mutex::new(pot::POT::new(None)));
 
     match walker::find_ts_files(path, exclude) {
         Ok(entries) => {
             for entry in entries {
                 println!("{:?}", entry.path());
-                parser::parse_file(&entry.into_path(), &mut pot);
+                parser::parse_file(&entry.into_path(), Arc::clone(&pot));
             }
         }
         Err(e) => {

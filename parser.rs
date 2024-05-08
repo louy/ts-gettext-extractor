@@ -1,6 +1,6 @@
 extern crate swc_ecma_parser;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use swc_common::sync::Lrc;
 use swc_common::{
@@ -10,7 +10,7 @@ use swc_common::{
 use swc_ecma_parser::{lexer::Lexer, EsConfig, Parser, StringInput, Syntax, TsConfig};
 use swc_ecma_visit::FoldWith;
 
-pub fn parse_file(path: &PathBuf, pot: &mut Arc<crate::pot::POT>) {
+pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
     let syntax = match path.extension() {
         Some(os_str) => match os_str.to_str() {
             Some("d.ts") => Syntax::Typescript(TsConfig {

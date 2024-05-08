@@ -1,12 +1,18 @@
-use std::{ops::Deref, sync::Arc};
+use std::{
+    borrow::BorrowMut,
+    ops::{Deref, DerefMut},
+    sync::{Arc, Mutex},
+};
 
 use swc_ecma_ast::*;
 use swc_ecma_visit::{noop_fold_type, Fold, FoldWith};
 
-pub struct GettextVisitor<'a> {
-    pub pot: &'a mut Arc<crate::pot::POT>,
+use crate::pot::POTMessageID;
+
+pub struct GettextVisitor {
+    pub pot: Arc<Mutex<crate::pot::POT>>,
 }
-impl Fold for GettextVisitor<'_> {
+impl Fold for GettextVisitor {
     noop_fold_type!();
 
     fn fold_call_expr(&mut self, call: CallExpr) -> CallExpr {
@@ -28,6 +34,20 @@ impl Fold for GettextVisitor<'_> {
                     }) => match sym.as_str() {
                         "__" => {
                             println!("Found call to: {:?}", sym);
+                            match args.first() {
+                                Some(ExprOrSpread { expr, .. }) => match &expr.deref() {
+                                    Expr::Lit(Lit::Str(Str { value, .. })) => {
+                                        println!("Found string: {:?}", value);
+                                        self.pot.lock().unwrap().add_message(
+                                            None,
+                                            POTMessageID::Singular(value.to_string()),
+                                            "src/main.js",
+                                        );
+                                    }
+                                    _ => {}
+                                },
+                                _ => {}
+                            }
                         }
                         _ => {}
                     },
@@ -62,10 +82,10 @@ mod tests {
 
     #[test]
     fn detects_singular_message_with_no_context() {
-        let mut pot = Arc::new(crate::pot::POT::new());
-        parse("test.js", r#"__("Hello, world!");"#, &mut pot);
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse("test.js", r#"__("Hello, world!");"#, Arc::clone(&pot));
         assert_eq!(
-            pot.to_string("default"),
+            pot.lock().unwrap().to_string(None),
             r#"#: src/main.js
 msgid "Hello, world!"
 msgstr ""
@@ -74,7 +94,7 @@ msgstr ""
         );
     }
 
-    fn parse(filename: &str, source: &str, pot: &mut Arc<crate::pot::POT>) {
+    fn parse(filename: &str, source: &str, pot: Arc<Mutex<crate::pot::POT>>) {
         let mut visitor = GettextVisitor { pot };
         let cm: Lrc<SourceMap> = Default::default();
         let fm = cm.new_source_file(FileName::Custom(filename.into()), source.into());

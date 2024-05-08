@@ -22,19 +22,21 @@ impl POTFile {
 
 #[derive()]
 pub struct POT {
+    pub default_domain: String,
     domains: IndexMap<String, POTFile>,
 }
 impl POT {
-    pub fn new() -> Self {
+    pub fn new(default_domain: impl Into<Option<String>>) -> Self {
         Self {
+            default_domain: default_domain.into().unwrap_or("default".to_string()),
             domains: IndexMap::new(),
         }
     }
 
-    pub fn add_message(&mut self, domain: &str, message: POTMessageID, reference: &str) {
+    pub fn add_message(&mut self, domain: Option<&str>, message: POTMessageID, reference: &str) {
         let file = self
             .domains
-            .entry(domain.to_string())
+            .entry(domain.unwrap_or(&self.default_domain).to_string())
             .or_insert_with(POTFile::new);
         file.messages
             .entry(message)
@@ -42,9 +44,9 @@ impl POT {
             .insert(reference.to_string());
     }
 
-    pub fn to_string(&self, domain: &str) -> String {
+    pub fn to_string(&self, domain: Option<&str>) -> String {
         let mut result = String::new();
-        if let Some(file) = self.domains.get(domain) {
+        if let Some(file) = self.domains.get(domain.unwrap_or(&self.default_domain)) {
             for (message, references) in &file.messages {
                 for reference in references {
                     result.push_str(&format!("#: {}\n", reference));
@@ -109,14 +111,14 @@ mod tests {
 
     #[test]
     fn generates_file_with_singular_message() {
-        let mut pot = POT::new();
+        let mut pot = POT::new(None);
         pot.add_message(
-            "messages",
+            None,
             POTMessageID::Singular("Hello, world!".to_string()),
             "src/main.rs",
         );
         assert_eq!(
-            pot.to_string("messages"),
+            pot.to_string(None),
             r#"#: src/main.rs
 msgid "Hello, world!"
 msgstr ""
@@ -126,14 +128,14 @@ msgstr ""
     }
     #[test]
     fn generates_file_with_plural_message() {
-        let mut pot = POT::new();
+        let mut pot = POT::new(None);
         pot.add_message(
-            "messages",
+            None,
             POTMessageID::Plural("%d person".to_string(), "%d people".to_string()),
             "src/main.rs",
         );
         assert_eq!(
-            pot.to_string("messages"),
+            pot.to_string(None),
             r#"#: src/main.rs
 msgid "%d person"
 msgid_plural "%d people"
@@ -146,14 +148,14 @@ msgstr[1] ""
 
     #[test]
     fn generates_file_with_context_messages() {
-        let mut pot = POT::new();
+        let mut pot = POT::new(None);
         pot.add_message(
-            "messages",
+            None,
             POTMessageID::SingularWithContext("menu".to_string(), "File".to_string()),
             "src/main.rs",
         );
         pot.add_message(
-            "messages",
+            None,
             POTMessageID::PluralWithContext(
                 "menu".to_string(),
                 "%d file".to_string(),
@@ -162,7 +164,7 @@ msgstr[1] ""
             "src/main.rs",
         );
         assert_eq!(
-            pot.to_string("messages"),
+            pot.to_string(None),
             r#"#: src/main.rs
 msgctxt "menu"
 msgid "File"
@@ -181,24 +183,24 @@ msgstr[1] ""
 
     #[test]
     fn it_deduplicates_references() {
-        let mut pot = POT::new();
+        let mut pot = POT::new(None);
         pot.add_message(
-            "messages",
+            None,
             POTMessageID::Singular("Hello, world!".to_string()),
             "src/main.rs:1",
         );
         pot.add_message(
-            "messages",
+            None,
             POTMessageID::Singular("Hello, world!".to_string()),
             "src/main.rs:10",
         );
         pot.add_message(
-            "messages",
+            None,
             POTMessageID::Singular("Hello, world!".to_string()),
             "src/main.rs:10",
         );
         assert_eq!(
-            pot.to_string("messages"),
+            pot.to_string(None),
             r#"#: src/main.rs:1
 #: src/main.rs:10
 msgid "Hello, world!"
@@ -210,14 +212,14 @@ msgstr ""
 
     #[test]
     fn it_breaks_long_ids_into_multiple_lines() {
-        let mut pot = POT::new();
+        let mut pot = POT::new(None);
         pot.add_message(
-            "messages",
+            None,
             POTMessageID::Singular("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string()),
             "src/main.rs",
         );
         assert_eq!(
-            pot.to_string("messages"),
+            pot.to_string(None),
             r#"#: src/main.rs
 msgid ""
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
