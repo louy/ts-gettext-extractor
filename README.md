@@ -1,4 +1,4 @@
-# TS Gettext Extractor
+# TS Gettext Extractor
 A command line utility to generate Gettext template files (`.pot`) from Javascript/Typescript code.
 
 Uses SWC to parse JS files.
@@ -25,3 +25,10 @@ Options:
   -h, --help
           Print help
 ```
+
+## Supported functions
+
+- **`gettext`** or **`__`** — e.g. `__('String')`
+- **`ngettext`** or **`__n`** — e.g. `__n('1 item', '%n items', count)`
+- **`dgettext`** or **`__d`** — e.g. `__d('domain', 'String')`
+- **`dngettext`** or **`__dn`** — e.g. `__dn('domain', '1 item', '%n items', count)`
