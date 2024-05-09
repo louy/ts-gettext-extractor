@@ -62,7 +62,7 @@ fn run(args: Cli) {
     match walker::find_ts_files(path, exclude) {
         Ok(entries) => {
             for entry in entries {
-                println!("{:?}", entry.path());
+                println!("Processing {}", entry.path().to_str().unwrap());
                 parser::parse_file(&entry.into_path(), Arc::clone(&pot));
             }
         }
@@ -72,7 +72,7 @@ fn run(args: Cli) {
         }
     }
 
-    println!("Writing pot files to {:?}", output_folder);
+    println!("Writing pot files to {}", output_folder.to_str().unwrap());
     let _ = fs::remove_dir_all(&output_folder);
     match fs::create_dir_all(&output_folder) {
         Ok(_) => {}
@@ -88,7 +88,7 @@ fn run(args: Cli) {
         .iter()
         .for_each(|(domain, pot_file)| {
             let file_path = output_folder.join(format!("{}.pot", domain));
-            println!("Writing {:?}", file_path);
+            println!("Writing {}", file_path.to_str().unwrap());
             let mut file = std::fs::File::create(file_path).unwrap();
             file.write_all(pot_file.to_string().as_bytes()).unwrap();
         });
