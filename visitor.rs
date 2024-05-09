@@ -3,7 +3,10 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use swc_common::{comments::Comments, sync::Lrc};
+use swc_common::{
+    comments::{Comment, Comments},
+    sync::Lrc,
+};
 use swc_common::{SourceMap, Span};
 use swc_ecma_ast::*;
 use swc_ecma_visit::{noop_visit_type, Visit};
@@ -19,23 +22,20 @@ impl GettextVisitor<'_> {
     fn add_message_meta(&self, span: &Span, meta: &mut POTMessageMeta) {
         meta.references.push(format_reference(&self.cm, span));
 
+        let mut comments = Vec::<Comment>::new();
+
         match self.comments.get_leading(span.lo) {
-            Some(comments) => {
-                for comment in comments {
-                    meta.extracted_comments
-                        .push(comment.text.trim().to_string());
-                }
-            }
+            Some(leading) => comments.extend(leading),
             None => {}
         }
         match self.comments.get_trailing(span.hi) {
-            Some(comments) => {
-                for comment in comments {
-                    meta.extracted_comments
-                        .push(comment.text.trim().to_string());
-                }
-            }
+            Some(trailing) => comments.extend(trailing),
             None => {}
+        }
+
+        for comment in comments {
+            meta.extracted_comments
+                .push(comment.text.trim().to_string());
         }
     }
 }
