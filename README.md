@@ -36,3 +36,24 @@ Options:
 - **`dngettext`** or **`__dn`** — e.g. `__dn('domain', '1 item', '%n items', count)`
 - **`dpgettext`** or **`__dp`** — e.g. `__dp('domain', 'context', 'String')`
 - **`dnpgettext`** or **`__dnp`** — e.g. `__dnp('domain', 'context', '1 item', '%n items', count)`
+
+## Metadata
+
+This library produces a few metadata in the POT files as below.
+
+### References
+References to the code is produced in accordance with the [po file spec](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html). Each reference mentioned the source file name and line number. References are relative to the `--references-relative-to` argument (or `--output-folder`).
+
+### Comments
+Comments before or after a `gettext` function call are also extracted. This only applies to comments directly before the function call, not comments on the previous line.
+
+For example, this WILL be extracted:
+```js
+const myText = /* ✅ A comment that will be extracted */ __('My text');
+```
+
+This WILL NOT be extracted:
+```js
+/* ❌ A comment that won't be extracted */
+const myText = __('My text');
+```
