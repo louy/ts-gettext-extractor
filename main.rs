@@ -2,7 +2,6 @@ use clap::Parser;
 use std::{
     fs,
     io::Write,
-    process::exit,
     sync::{Arc, Mutex},
 };
 
@@ -67,8 +66,7 @@ fn run(args: Cli) {
             }
         }
         Err(e) => {
-            eprintln!("Error reading path: {}", e);
-            exit(1)
+            panic!("Error reading path: {}", e);
         }
     }
 
@@ -77,8 +75,7 @@ fn run(args: Cli) {
     match fs::create_dir_all(&output_folder) {
         Ok(_) => {}
         Err(e) => {
-            eprintln!("Error creating output folder: {}", e);
-            exit(1)
+            panic!("Error creating output folder: {}", e);
         }
     }
 
@@ -92,15 +89,13 @@ fn run(args: Cli) {
             let mut file = match std::fs::File::create(file_path) {
                 Ok(file) => file,
                 Err(e) => {
-                    eprintln!("Failed to create file: {}", e);
-                    exit(1)
+                    panic!("Failed to create file: {}", e);
                 }
             };
             match file.write_all(pot_file.to_string().as_bytes()) {
                 Ok(_) => {}
                 Err(e) => {
-                    eprintln!("Failed to write file: {}", e);
-                    exit(1)
+                    panic!("Failed to write file: {}", e);
                 }
             };
         });
