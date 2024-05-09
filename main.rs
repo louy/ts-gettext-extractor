@@ -89,8 +89,20 @@ fn run(args: Cli) {
         .for_each(|(domain, pot_file)| {
             let file_path = output_folder.join(format!("{}.pot", domain));
             println!("Writing {}", file_path.to_str().unwrap());
-            let mut file = std::fs::File::create(file_path).unwrap();
-            file.write_all(pot_file.to_string().as_bytes()).unwrap();
+            let mut file = match std::fs::File::create(file_path) {
+                Ok(file) => file,
+                Err(e) => {
+                    eprintln!("Failed to create file: {}", e);
+                    exit(1)
+                }
+            };
+            match file.write_all(pot_file.to_string().as_bytes()) {
+                Ok(_) => {}
+                Err(e) => {
+                    eprintln!("Failed to write file: {}", e);
+                    exit(1)
+                }
+            };
         });
 
     println!("Done");

@@ -10,6 +10,7 @@ use swc_common::{
 use swc_ecma_parser::{lexer::Lexer, EsConfig, Parser, StringInput, Syntax, TsConfig};
 use swc_ecma_visit::VisitWith;
 
+/// Extract gettext strings from a source file
 pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
     let syntax = match path.extension() {
         Some(os_str) => match os_str.to_str() {
@@ -42,7 +43,7 @@ pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
     let handler = Handler::with_tty_emitter(ColorConfig::Auto, true, false, Some(cm.clone()));
     let comments: swc_common::comments::SingleThreadedComments = Default::default();
 
-    let fm = cm.load_file(path).expect("failed to load file");
+    let fm = cm.load_file(path).expect("Failed to load file");
     let lexer = Lexer::new(
         syntax,
         // EsVersion defaults to es5
