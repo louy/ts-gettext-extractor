@@ -40,6 +40,7 @@ pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
 
     let cm: Lrc<SourceMap> = Default::default();
     let handler = Handler::with_tty_emitter(ColorConfig::Auto, true, false, Some(cm.clone()));
+    let comments: swc_common::comments::SingleThreadedComments = Default::default();
 
     let fm = cm.load_file(path).expect("failed to load file");
     let lexer = Lexer::new(
@@ -47,7 +48,7 @@ pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
         // EsVersion defaults to es5
         Default::default(),
         StringInput::from(&*fm),
-        None,
+        Some(&comments),
     );
     let mut parser = Parser::new_from(lexer);
 
@@ -66,6 +67,7 @@ pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
     let mut visitor = crate::visitor::GettextVisitor {
         pot: pot,
         cm: Lrc::clone(&cm),
+        comments: Some(&comments),
     };
 
     module.visit_with(&mut visitor);

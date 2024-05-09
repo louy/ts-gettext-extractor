@@ -52,12 +52,12 @@ fn run(args: Cli) {
     let output_folder = args.output_folder;
     let references_relative_to = args.references_relative_to.unwrap_or(output_folder.clone());
 
-    println!(
-        "exclude: {:?}\npath: {:?}\noutput: {:?}\nreferences_relative_to: {:?}\ndefault_domain: {:?}",
-        exclude, path, output_folder, references_relative_to, default_domain
-    );
+    // println!(
+    //     "exclude: {:?}\npath: {:?}\noutput: {:?}\nreferences_relative_to: {:?}\ndefault_domain: {:?}",
+    //     exclude, path, output_folder, references_relative_to, default_domain
+    // );
 
-    let pot = Arc::new(Mutex::new(pot::POT::new(None)));
+    let pot = Arc::new(Mutex::new(pot::POT::new(default_domain)));
 
     match walker::find_ts_files(path, exclude) {
         Ok(entries) => {
@@ -73,8 +73,14 @@ fn run(args: Cli) {
     }
 
     println!("Writing pot files to {:?}", output_folder);
-    fs::remove_dir_all(&output_folder).unwrap_or_default();
-    fs::create_dir(&output_folder).unwrap();
+    let _ = fs::remove_dir_all(&output_folder);
+    match fs::create_dir_all(&output_folder) {
+        Ok(_) => {}
+        Err(e) => {
+            eprintln!("Error creating output folder: {}", e);
+            exit(1)
+        }
+    }
 
     pot.lock()
         .unwrap()
@@ -86,6 +92,8 @@ fn run(args: Cli) {
             let mut file = std::fs::File::create(file_path).unwrap();
             file.write_all(pot_file.to_string().as_bytes()).unwrap();
         });
+
+    println!("Done");
 }
 
 #[cfg(test)]
@@ -109,6 +117,8 @@ mod tests {
             "./tests/src/",
             "--output-folder",
             "./tests/output/",
+            "--default-domain",
+            "test",
         ]);
         run(args);
         for entry in WalkDir::new(&"./tests/output/")

@@ -3,238 +3,233 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use swc_common::sync::Lrc;
+use swc_common::{comments::Comments, sync::Lrc};
 use swc_common::{SourceMap, Span};
 use swc_ecma_ast::*;
 use swc_ecma_visit::{noop_visit_type, Visit};
 
-use crate::pot::POTMessageID;
+use crate::pot::{POTMessageID, POTMessageMeta};
 
-pub struct GettextVisitor {
+pub struct GettextVisitor<'a> {
     pub pot: Arc<Mutex<crate::pot::POT>>,
     pub cm: Lrc<SourceMap>,
+    pub comments: Option<&'a dyn Comments>,
 }
-impl Visit for GettextVisitor {
+impl GettextVisitor<'_> {
+    fn add_message_meta(&self, span: &Span, meta: &mut POTMessageMeta) {
+        meta.references.push(format_reference(&self.cm, span));
+
+        match self.comments.get_leading(span.lo) {
+            Some(comments) => {
+                for comment in comments {
+                    meta.extracted_comments
+                        .push(comment.text.trim().to_string());
+                }
+            }
+            None => {}
+        }
+        match self.comments.get_trailing(span.hi) {
+            Some(comments) => {
+                for comment in comments {
+                    meta.extracted_comments
+                        .push(comment.text.trim().to_string());
+                }
+            }
+            None => {}
+        }
+    }
+}
+impl Visit for GettextVisitor<'_> {
     noop_visit_type!();
 
     fn visit_call_expr(&mut self, call: &CallExpr) {
-        // let call = call.visit_children_with(self);
-        println!("{:?}", call);
-
         match &call {
             CallExpr {
                 callee: Callee::Expr(expr),
                 args,
+                span,
                 ..
             } => match &expr.deref() {
-                Expr::Ident(Ident {
-                    span,
-                    sym,
-                    optional: _,
-                }) => match sym.as_str() {
-                    "__" | "gettext" => {
-                        println!("Found call to: {:?}", sym);
-                        match &args[..1] {
-                            [ExprOrSpread { expr, .. }] => match &expr.deref() {
-                                Expr::Lit(Lit::Str(Str { value, .. })) => {
+                Expr::Ident(Ident { sym, .. }) => match sym.as_str() {
+                    "__" | "gettext" => match &args[..1] {
+                        [ExprOrSpread { expr, .. }] => match &expr.deref() {
+                            Expr::Lit(Lit::Str(Str { value, .. })) => {
+                                let pot = &mut self.pot.lock().unwrap();
+                                let meta = pot.add_message(
+                                    None,
+                                    POTMessageID::Singular(None, value.to_string()),
+                                );
+                                self.add_message_meta(span, meta)
+                            }
+                            _ => {}
+                        },
+                        _ => {}
+                    },
+                    "__n" | "ngettext" => match &args[..2] {
+                        [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
+                            match (&expr1.deref(), &expr2.deref()) {
+                                (
+                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                ) => {
                                     let pot = &mut self.pot.lock().unwrap();
                                     let meta = pot.add_message(
                                         None,
-                                        POTMessageID::Singular(None, value.to_string()),
+                                        POTMessageID::Plural(
+                                            None,
+                                            value1.to_string(),
+                                            value2.to_string(),
+                                        ),
                                     );
-                                    meta.references.push(format_reference(&self.cm, span))
+                                    self.add_message_meta(span, meta)
                                 }
                                 _ => {}
-                            },
-                            _ => {}
+                            }
                         }
-                    }
-                    "__n" | "ngettext" => {
-                        println!("Found call to: {:?}", sym);
-                        match &args[..2] {
-                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
-                                match (&expr1.deref(), &expr2.deref()) {
-                                    (
-                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                    ) => {
-                                        let pot = &mut self.pot.lock().unwrap();
-                                        let meta = pot.add_message(
+                        _ => {}
+                    },
+                    "__p" | "pgettext" => match &args[..2] {
+                        [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
+                            match (&expr1.deref(), &expr2.deref()) {
+                                (
+                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                ) => {
+                                    let pot = &mut self.pot.lock().unwrap();
+                                    let meta = pot.add_message(
+                                        None,
+                                        POTMessageID::Singular(
+                                            Some(value1.to_string()),
+                                            value2.to_string(),
+                                        ),
+                                    );
+                                    self.add_message_meta(span, meta)
+                                }
+                                _ => {}
+                            }
+                        }
+                        _ => {}
+                    },
+                    "__np" | "npgettext" => match &args[..3] {
+                        [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
+                            match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
+                                (
+                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value3, .. })),
+                                ) => {
+                                    let pot = &mut self.pot.lock().unwrap();
+                                    let meta = pot.add_message(
+                                        None,
+                                        POTMessageID::Plural(
+                                            Some(value1.to_string()),
+                                            value2.to_string(),
+                                            value3.to_string(),
+                                        ),
+                                    );
+                                    self.add_message_meta(span, meta)
+                                }
+                                _ => {}
+                            }
+                        }
+                        _ => {}
+                    },
+                    "__d" | "dgettext" => match &args[..2] {
+                        [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
+                            match (&expr1.deref(), &expr2.deref()) {
+                                (
+                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                ) => {
+                                    let pot = &mut self.pot.lock().unwrap();
+                                    let meta = pot.add_message(
+                                        Some(value1.to_string()),
+                                        POTMessageID::Singular(None, value2.to_string()),
+                                    );
+                                    self.add_message_meta(span, meta)
+                                }
+                                _ => {}
+                            }
+                        }
+                        _ => {}
+                    },
+                    "__dn" | "dngettext" => match &args[..3] {
+                        [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
+                            match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
+                                (
+                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value3, .. })),
+                                ) => {
+                                    let pot = &mut self.pot.lock().unwrap();
+                                    let meta = pot.add_message(
+                                        Some(value1.to_string()),
+                                        POTMessageID::Plural(
                                             None,
-                                            POTMessageID::Plural(
-                                                None,
-                                                value1.to_string(),
-                                                value2.to_string(),
-                                            ),
-                                        );
-                                        meta.references.push(format_reference(&self.cm, span))
-                                    }
-                                    _ => {}
+                                            value2.to_string(),
+                                            value3.to_string(),
+                                        ),
+                                    );
+                                    self.add_message_meta(span, meta)
                                 }
+                                _ => {}
                             }
-                            _ => {}
                         }
-                    }
-                    "__p" | "pgettext" => {
-                        println!("Found call to: {:?}", sym);
-                        match &args[..2] {
-                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
-                                match (&expr1.deref(), &expr2.deref()) {
-                                    (
-                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                    ) => {
-                                        let pot = &mut self.pot.lock().unwrap();
-                                        let meta = pot.add_message(
-                                            None,
-                                            POTMessageID::Singular(
-                                                Some(value1.to_string()),
-                                                value2.to_string(),
-                                            ),
-                                        );
-                                        meta.references.push(format_reference(&self.cm, span))
-                                    }
-                                    _ => {}
+                        _ => {}
+                    },
+                    "__dp" | "dpgettext" => match &args[..3] {
+                        [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
+                            match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
+                                (
+                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value3, .. })),
+                                ) => {
+                                    let pot = &mut self.pot.lock().unwrap();
+                                    let meta = pot.add_message(
+                                        Some(value1.to_string()),
+                                        POTMessageID::Singular(
+                                            Some(value2.to_string()),
+                                            value3.to_string(),
+                                        ),
+                                    );
+                                    self.add_message_meta(span, meta)
                                 }
+                                _ => {}
                             }
-                            _ => {}
                         }
-                    }
-                    "__np" | "npgettext" => {
-                        println!("Found call to: {:?}", sym);
-                        match &args[..3] {
-                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
-                                match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
-                                    (
-                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value3, .. })),
-                                    ) => {
-                                        let pot = &mut self.pot.lock().unwrap();
-                                        let meta = pot.add_message(
-                                            None,
-                                            POTMessageID::Plural(
-                                                Some(value1.to_string()),
-                                                value2.to_string(),
-                                                value3.to_string(),
-                                            ),
-                                        );
-                                        meta.references.push(format_reference(&self.cm, span))
-                                    }
-                                    _ => {}
+                        _ => {}
+                    },
+                    "__dnp" | "dnpgettext" => match &args[..4] {
+                        [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }, ExprOrSpread { expr: expr4, .. }] => {
+                            match (
+                                &expr1.deref(),
+                                &expr2.deref(),
+                                &expr3.deref(),
+                                &expr4.deref(),
+                            ) {
+                                (
+                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value3, .. })),
+                                    Expr::Lit(Lit::Str(Str { value: value4, .. })),
+                                ) => {
+                                    let pot = &mut self.pot.lock().unwrap();
+                                    let meta = pot.add_message(
+                                        Some(value1.to_string()),
+                                        POTMessageID::Plural(
+                                            Some(value2.to_string()),
+                                            value3.to_string(),
+                                            value4.to_string(),
+                                        ),
+                                    );
+                                    self.add_message_meta(span, meta)
                                 }
+                                _ => {}
                             }
-                            _ => {}
                         }
-                    }
-                    "__d" | "dgettext" => {
-                        println!("Found call to: {:?}", sym);
-                        match &args[..2] {
-                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
-                                match (&expr1.deref(), &expr2.deref()) {
-                                    (
-                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                    ) => {
-                                        let pot = &mut self.pot.lock().unwrap();
-                                        let meta = pot.add_message(
-                                            Some(value1.to_string()),
-                                            POTMessageID::Singular(None, value2.to_string()),
-                                        );
-                                        meta.references.push(format_reference(&self.cm, span))
-                                    }
-                                    _ => {}
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                    "__dn" | "dngettext" => {
-                        println!("Found call to: {:?}", sym);
-                        match &args[..3] {
-                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
-                                match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
-                                    (
-                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value3, .. })),
-                                    ) => {
-                                        let pot = &mut self.pot.lock().unwrap();
-                                        let meta = pot.add_message(
-                                            Some(value1.to_string()),
-                                            POTMessageID::Plural(
-                                                None,
-                                                value2.to_string(),
-                                                value3.to_string(),
-                                            ),
-                                        );
-                                        meta.references.push(format_reference(&self.cm, span))
-                                    }
-                                    _ => {}
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                    "__dp" | "dpgettext" => {
-                        println!("Found call to: {:?}", sym);
-                        match &args[..3] {
-                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
-                                match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
-                                    (
-                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value3, .. })),
-                                    ) => {
-                                        let pot = &mut self.pot.lock().unwrap();
-                                        let meta = pot.add_message(
-                                            Some(value1.to_string()),
-                                            POTMessageID::Singular(
-                                                Some(value2.to_string()),
-                                                value3.to_string(),
-                                            ),
-                                        );
-                                        meta.references.push(format_reference(&self.cm, span))
-                                    }
-                                    _ => {}
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                    "__dnp" | "dnpgettext" => {
-                        println!("Found call to: {:?}", sym);
-                        match &args[..4] {
-                            [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }, ExprOrSpread { expr: expr4, .. }] => {
-                                match (
-                                    &expr1.deref(),
-                                    &expr2.deref(),
-                                    &expr3.deref(),
-                                    &expr4.deref(),
-                                ) {
-                                    (
-                                        Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value3, .. })),
-                                        Expr::Lit(Lit::Str(Str { value: value4, .. })),
-                                    ) => {
-                                        let pot = &mut self.pot.lock().unwrap();
-                                        let meta = pot.add_message(
-                                            Some(value1.to_string()),
-                                            POTMessageID::Plural(
-                                                Some(value2.to_string()),
-                                                value3.to_string(),
-                                                value4.to_string(),
-                                            ),
-                                        );
-                                        meta.references.push(format_reference(&self.cm, span))
-                                    }
-                                    _ => {}
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
+                        _ => {}
+                    },
                     _ => {}
                 },
                 _ => {}
@@ -327,20 +322,72 @@ msgstr[1] ""
         );
     }
 
+    #[test]
+    fn detects_message_with_comment() {
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse(
+            "test.js",
+            r#"/* Test comment */ __("Test message");"#,
+            Arc::clone(&pot),
+        );
+        assert_eq!(
+            pot.lock().unwrap().to_string(None).unwrap(),
+            r#"#. Test comment
+#: test.js:1
+msgid "Test message"
+msgstr ""
+
+"#
+        );
+    }
+
+    // Comments seem to behave differently in tsx, so this is a regression test
+    #[test]
+    fn detects_message_with_comment_in_jsx() {
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse(
+            "file.tsx",
+            r#"
+<App>{
+    /* Test comment */ __n("1 object", "%d objects", 3)
+}</App>;"#,
+            Arc::clone(&pot),
+        );
+        assert_eq!(
+            pot.lock().unwrap().to_string(None).unwrap(),
+            r#"#. Test comment
+#: file.tsx:3
+msgid "1 object"
+msgid_plural "%d objects"
+msgstr[0] ""
+msgstr[1] ""
+
+"#
+        );
+    }
+
     use swc_ecma_visit::VisitWith;
 
     fn parse(filename: &str, source: &str, pot: Arc<Mutex<crate::pot::POT>>) {
         let cm: Lrc<SourceMap> = Default::default();
+        let comments: swc_common::comments::SingleThreadedComments = Default::default();
         let mut visitor = GettextVisitor {
             pot,
             cm: Lrc::clone(&cm),
+            comments: Some(&comments),
         };
         let fm = cm.new_source_file(FileName::Custom(filename.into()), source.into());
         let lexer = Lexer::new(
-            Default::default(),
+            swc_ecma_parser::Syntax::Typescript(swc_ecma_parser::TsConfig {
+                tsx: true,
+                decorators: true,
+                dts: false,
+                no_early_errors: true,
+                disallow_ambiguous_jsx_like: false,
+            }),
             Default::default(),
             StringInput::from(&*fm),
-            None,
+            Some(&comments),
         );
         let mut parser = Parser::new_from(lexer);
         let module = parser.parse_module().unwrap();
