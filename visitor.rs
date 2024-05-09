@@ -37,11 +37,12 @@ impl Visit for GettextVisitor {
                         match &args[..1] {
                             [ExprOrSpread { expr, .. }] => match &expr.deref() {
                                 Expr::Lit(Lit::Str(Str { value, .. })) => {
-                                    self.pot.lock().unwrap().add_message(
+                                    let pot = &mut self.pot.lock().unwrap();
+                                    let meta = pot.add_message(
                                         None,
                                         POTMessageID::Singular(None, value.to_string()),
-                                        format_reference(&self.cm, span),
                                     );
+                                    meta.references.push(format_reference(&self.cm, span))
                                 }
                                 _ => {}
                             },
@@ -57,15 +58,16 @@ impl Visit for GettextVisitor {
                                         Expr::Lit(Lit::Str(Str { value: value1, .. })),
                                         Expr::Lit(Lit::Str(Str { value: value2, .. })),
                                     ) => {
-                                        self.pot.lock().unwrap().add_message(
+                                        let pot = &mut self.pot.lock().unwrap();
+                                        let meta = pot.add_message(
                                             None,
                                             POTMessageID::Plural(
                                                 None,
                                                 value1.to_string(),
                                                 value2.to_string(),
                                             ),
-                                            format_reference(&self.cm, span),
                                         );
+                                        meta.references.push(format_reference(&self.cm, span))
                                     }
                                     _ => {}
                                 }
@@ -82,14 +84,15 @@ impl Visit for GettextVisitor {
                                         Expr::Lit(Lit::Str(Str { value: value1, .. })),
                                         Expr::Lit(Lit::Str(Str { value: value2, .. })),
                                     ) => {
-                                        self.pot.lock().unwrap().add_message(
+                                        let pot = &mut self.pot.lock().unwrap();
+                                        let meta = pot.add_message(
                                             None,
                                             POTMessageID::Singular(
                                                 Some(value1.to_string()),
                                                 value2.to_string(),
                                             ),
-                                            format_reference(&self.cm, span),
                                         );
+                                        meta.references.push(format_reference(&self.cm, span))
                                     }
                                     _ => {}
                                 }
@@ -107,15 +110,16 @@ impl Visit for GettextVisitor {
                                         Expr::Lit(Lit::Str(Str { value: value2, .. })),
                                         Expr::Lit(Lit::Str(Str { value: value3, .. })),
                                     ) => {
-                                        self.pot.lock().unwrap().add_message(
+                                        let pot = &mut self.pot.lock().unwrap();
+                                        let meta = pot.add_message(
                                             None,
                                             POTMessageID::Plural(
                                                 Some(value1.to_string()),
                                                 value2.to_string(),
                                                 value3.to_string(),
                                             ),
-                                            format_reference(&self.cm, span),
                                         );
+                                        meta.references.push(format_reference(&self.cm, span))
                                     }
                                     _ => {}
                                 }
@@ -132,11 +136,12 @@ impl Visit for GettextVisitor {
                                         Expr::Lit(Lit::Str(Str { value: value1, .. })),
                                         Expr::Lit(Lit::Str(Str { value: value2, .. })),
                                     ) => {
-                                        self.pot.lock().unwrap().add_message(
+                                        let pot = &mut self.pot.lock().unwrap();
+                                        let meta = pot.add_message(
                                             Some(value1.to_string()),
                                             POTMessageID::Singular(None, value2.to_string()),
-                                            format_reference(&self.cm, span),
                                         );
+                                        meta.references.push(format_reference(&self.cm, span))
                                     }
                                     _ => {}
                                 }
@@ -154,15 +159,16 @@ impl Visit for GettextVisitor {
                                         Expr::Lit(Lit::Str(Str { value: value2, .. })),
                                         Expr::Lit(Lit::Str(Str { value: value3, .. })),
                                     ) => {
-                                        self.pot.lock().unwrap().add_message(
+                                        let pot = &mut self.pot.lock().unwrap();
+                                        let meta = pot.add_message(
                                             Some(value1.to_string()),
                                             POTMessageID::Plural(
                                                 None,
                                                 value2.to_string(),
                                                 value3.to_string(),
                                             ),
-                                            format_reference(&self.cm, span),
                                         );
+                                        meta.references.push(format_reference(&self.cm, span))
                                     }
                                     _ => {}
                                 }
@@ -180,14 +186,15 @@ impl Visit for GettextVisitor {
                                         Expr::Lit(Lit::Str(Str { value: value2, .. })),
                                         Expr::Lit(Lit::Str(Str { value: value3, .. })),
                                     ) => {
-                                        self.pot.lock().unwrap().add_message(
+                                        let pot = &mut self.pot.lock().unwrap();
+                                        let meta = pot.add_message(
                                             Some(value1.to_string()),
                                             POTMessageID::Singular(
                                                 Some(value2.to_string()),
                                                 value3.to_string(),
                                             ),
-                                            format_reference(&self.cm, span),
                                         );
+                                        meta.references.push(format_reference(&self.cm, span))
                                     }
                                     _ => {}
                                 }
@@ -211,15 +218,16 @@ impl Visit for GettextVisitor {
                                         Expr::Lit(Lit::Str(Str { value: value3, .. })),
                                         Expr::Lit(Lit::Str(Str { value: value4, .. })),
                                     ) => {
-                                        self.pot.lock().unwrap().add_message(
+                                        let pot = &mut self.pot.lock().unwrap();
+                                        let meta = pot.add_message(
                                             Some(value1.to_string()),
                                             POTMessageID::Plural(
                                                 Some(value2.to_string()),
                                                 value3.to_string(),
                                                 value4.to_string(),
                                             ),
-                                            format_reference(&self.cm, span),
                                         );
+                                        meta.references.push(format_reference(&self.cm, span))
                                     }
                                     _ => {}
                                 }

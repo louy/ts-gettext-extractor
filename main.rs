@@ -90,8 +90,6 @@ fn run(args: Cli) {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::File;
-
     use clap::{CommandFactory, Parser};
     use pretty_assertions::assert_eq;
     use walkdir::WalkDir;

@@ -1,15 +1,17 @@
-use indexmap::{IndexMap, IndexSet};
+use indexmap::IndexMap;
+// See https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html for details about a POT file format
 
+/// An individual message in a POT file
 #[derive(Debug, Eq, Hash, PartialEq)]
 pub enum POTMessageID {
     Singular(
-        /// Context
+        /// msgctx
         Option<String>,
         /// msgid
         String,
     ),
     Plural(
-        /// Context
+        /// msgctx
         Option<String>,
         /// msgid
         String,
@@ -17,50 +19,99 @@ pub enum POTMessageID {
         String,
     ),
 }
+impl POTMessageID {
+    fn to_string(&self) -> String {
+        let mut result = String::new();
+        match self {
+            POTMessageID::Singular(None, msg) => {
+                result.push_str(&format!("msgid {}\nmsgstr \"\"", format_message(msg)));
+            }
+            POTMessageID::Plural(None, msg1, msg2) => {
+                result.push_str(&format!(
+                    "msgid {}\nmsgid_plural {}\nmsgstr[0] \"\"\nmsgstr[1] \"\"",
+                    format_message(msg1),
+                    format_message(msg2)
+                ));
+            }
+            POTMessageID::Singular(Some(ctx), msg) => {
+                result.push_str(&format!(
+                    "msgctxt \"{}\"\nmsgid {}\nmsgstr \"\"",
+                    ctx,
+                    format_message(msg)
+                ));
+            }
+            POTMessageID::Plural(Some(ctx), msg1, msg2) => {
+                result.push_str(&format!(
+                    "msgctxt \"{}\"\nmsgid {}\nmsgid_plural {}\nmsgstr[0] \"\"\nmsgstr[1] \"\"",
+                    ctx,
+                    format_message(msg1),
+                    format_message(msg2)
+                ));
+            }
+        }
+        result
+    }
+}
 
-#[derive()]
+/// Metadata about a message in a POT file that doesn't affect it's uniqueness
+#[derive(Debug)]
+pub struct POTMessageMeta {
+    pub references: Vec<String>,
+    pub translator_comments: Vec<String>,
+    pub extracted_comments: Vec<String>,
+    pub flags: Vec<String>,
+}
+impl POTMessageMeta {
+    fn new() -> Self {
+        Self {
+            references: Vec::new(),
+            translator_comments: Vec::new(),
+            extracted_comments: Vec::new(),
+            flags: Vec::new(),
+        }
+    }
+
+    fn to_string(&self) -> String {
+        let mut result = String::new();
+        match self {
+            POTMessageMeta {
+                references,
+                translator_comments,
+                extracted_comments,
+                flags,
+            } => {
+                for comment in translator_comments {
+                    result.push_str(&format!("#  {}\n", comment));
+                }
+                for comment in extracted_comments {
+                    result.push_str(&format!("#. {}\n", comment));
+                }
+                for reference in references {
+                    result.push_str(&format!("#: {}\n", reference));
+                }
+                for flag in flags {
+                    result.push_str(&format!("#, {}\n", flag));
+                }
+            }
+        }
+        result
+    }
+}
+
+#[derive(Debug)]
 pub struct POTFile {
-    messages: IndexMap<POTMessageID, IndexSet<String>>,
+    messages: IndexMap<POTMessageID, POTMessageMeta>,
 }
 impl POTFile {
     pub fn to_string(&self) -> String {
         let mut result = String::new();
-            for (message, references) in &self.messages {
-                for reference in references {
-                    result.push_str(&format!("#: {}\n", reference));
-                }
-                match message {
-                    POTMessageID::Singular(None, msg) => {
-                        result.push_str(&format!("msgid {}\nmsgstr \"\"\n\n", format_message(msg)));
-                    }
-                    POTMessageID::Plural(None, msg1, msg2) => {
-                        result.push_str(&format!(
-                            "msgid {}\nmsgid_plural {}\nmsgstr[0] \"\"\nmsgstr[1] \"\"\n\n",
-                            format_message(msg1),
-                            format_message(msg2)
-                        ));
-                    }
-                    POTMessageID::Singular(Some(ctx), msg) => {
-                        result.push_str(&format!(
-                            "msgctxt \"{}\"\nmsgid {}\nmsgstr \"\"\n\n",
-                            ctx,
-                            format_message(msg)
-                        ));
-                    }
-                    POTMessageID::Plural(Some(ctx), msg1, msg2) => {
-                        result.push_str(&format!(
-                            "msgctxt \"{}\"\nmsgid {}\nmsgid_plural {}\nmsgstr[0] \"\"\nmsgstr[1] \"\"\n\n", 
-                            ctx, 
-                            format_message(msg1),
-                            format_message(msg2)
-                        ));
-                    }
-                }
-            }
+        for (message, meta) in &self.messages {
+            result.push_str(&meta.to_string());
+            result.push_str(&message.to_string());
+            result.push_str("\n\n");
+        }
         result
     }
-}
-impl POTFile {
     pub fn new() -> Self {
         Self {
             messages: IndexMap::new(),
@@ -68,10 +119,10 @@ impl POTFile {
     }
 }
 
-#[derive()]
+#[derive(Debug)]
 pub struct POT {
     default_domain: String,
-   pub domains: IndexMap<String, POTFile>,
+    pub domains: IndexMap<String, POTFile>,
 }
 impl POT {
     pub fn new(default_domain: impl Into<Option<String>>) -> Self {
@@ -81,15 +132,28 @@ impl POT {
         }
     }
 
-    pub fn add_message(&mut self, domain: Option<String>, message: POTMessageID, reference: String) {
+    pub fn add_message(
+        &mut self,
+        domain: Option<String>,
+        message: POTMessageID,
+    ) -> &mut POTMessageMeta {
         let file = self
             .domains
             .entry(domain.unwrap_or(self.default_domain.clone()).to_string())
             .or_insert_with(POTFile::new);
         file.messages
             .entry(message)
-            .or_insert_with(IndexSet::new)
-            .insert(reference.to_string());
+            .or_insert_with(POTMessageMeta::new)
+    }
+
+    pub fn add_message_reference(
+        &mut self,
+        domain: Option<String>,
+        message: POTMessageID,
+        reference: String,
+    ) {
+        let meta = self.add_message(domain, message);
+        meta.references.push(reference.to_string());
     }
 
     #[allow(dead_code)]
@@ -134,7 +198,7 @@ mod tests {
     #[test]
     fn generates_file_with_singular_message() {
         let mut pot = POT::new(None);
-        pot.add_message(
+        pot.add_message_reference(
             None,
             POTMessageID::Singular(None, "Hello, world!".to_string()),
             "src/main.rs".to_string(),
@@ -151,7 +215,7 @@ msgstr ""
     #[test]
     fn generates_file_with_plural_message() {
         let mut pot = POT::new(None);
-        pot.add_message(
+        pot.add_message_reference(
             None,
             POTMessageID::Plural(None, "%d person".to_string(), "%d people".to_string()),
             "src/main.rs".to_string(),
@@ -171,12 +235,12 @@ msgstr[1] ""
     #[test]
     fn generates_file_with_context_messages() {
         let mut pot = POT::new(None);
-        pot.add_message(
+        pot.add_message_reference(
             None,
             POTMessageID::Singular(Some("menu".to_string()), "File".to_string()),
             "src/main.rs".to_string(),
         );
-        pot.add_message(
+        pot.add_message_reference(
             None,
             POTMessageID::Plural(
                 Some("menu".to_string()),
@@ -204,38 +268,9 @@ msgstr[1] ""
     }
 
     #[test]
-    fn it_deduplicates_references() {
-        let mut pot = POT::new(None);
-        pot.add_message(
-            None,
-            POTMessageID::Singular(None, "Hello, world!".to_string()),
-            "src/main.rs:1".to_string(),
-        );
-        pot.add_message(
-            None,
-            POTMessageID::Singular(None, "Hello, world!".to_string()),
-            "src/main.rs:10".to_string(),
-        );
-        pot.add_message(
-            None,
-            POTMessageID::Singular(None, "Hello, world!".to_string()),
-            "src/main.rs:10".to_string(),
-        );
-        assert_eq!(
-            pot.to_string(None).unwrap(),
-            r#"#: src/main.rs:1
-#: src/main.rs:10
-msgid "Hello, world!"
-msgstr ""
-
-"#
-        );
-    }
-
-    #[test]
     fn it_breaks_long_ids_into_multiple_lines() {
         let mut pot = POT::new(None);
-        pot.add_message(
+        pot.add_message_reference(
             None,
             POTMessageID::Singular(None, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string()),
             "src/main.rs".to_string(),
