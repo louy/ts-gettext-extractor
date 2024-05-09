@@ -5,7 +5,6 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-mod parser;
 mod pot;
 mod visitor;
 mod walker;
@@ -62,7 +61,7 @@ fn run(args: Cli) {
         Ok(entries) => {
             for entry in entries {
                 println!("Processing {}", entry.path().to_str().unwrap());
-                parser::parse_file(&entry.into_path(), Arc::clone(&pot));
+                walker::parse_file(&entry.into_path(), Arc::clone(&pot));
             }
         }
         Err(e) => {
