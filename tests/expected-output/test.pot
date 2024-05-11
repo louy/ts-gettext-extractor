@@ -3,6 +3,14 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: src/test.ts:7
+msgid "Test backticks"
+msgstr ""
+
+#: src/test.ts:8
+msgid "Test backticks with __d"
+msgstr ""
+
 #: src/index.jsx:9
 msgctxt "title"
 msgid "App"

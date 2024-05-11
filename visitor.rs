@@ -58,26 +58,28 @@ impl Visit for GettextVisitor<'_> {
             } => match &expr.deref() {
                 Expr::Ident(Ident { sym, .. }) => match sym.as_str() {
                     "__" | "gettext" => match &args[..1] {
-                        [ExprOrSpread { expr, .. }] => match &expr.deref() {
-                            Expr::Lit(Lit::Str(Str { value, .. })) => {
-                                let pot = &mut self.pot.lock().unwrap();
-                                let meta = pot.add_message(
-                                    None,
-                                    POTMessageID::Singular(None, value.to_string()),
-                                );
-                                self.add_message_meta(span, meta)
+                        [ExprOrSpread { expr: expr1, .. }] => {
+                            match (&extract_string_from_expr(expr1),) {
+                                (Some(value1),) => {
+                                    let pot = &mut self.pot.lock().unwrap();
+                                    let meta = pot.add_message(
+                                        None,
+                                        POTMessageID::Singular(None, value1.to_string()),
+                                    );
+                                    self.add_message_meta(span, meta)
+                                }
+                                _ => {}
                             }
-                            _ => {}
-                        },
+                        }
                         _ => {}
                     },
                     "__n" | "ngettext" => match &args[..2] {
                         [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
-                            match (&expr1.deref(), &expr2.deref()) {
-                                (
-                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                ) => {
+                            match (
+                                &extract_string_from_expr(expr1),
+                                &extract_string_from_expr(expr2),
+                            ) {
+                                (Some(value1), Some(value2)) => {
                                     let pot = &mut self.pot.lock().unwrap();
                                     let meta = pot.add_message(
                                         None,
@@ -96,11 +98,11 @@ impl Visit for GettextVisitor<'_> {
                     },
                     "__p" | "pgettext" => match &args[..2] {
                         [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
-                            match (&expr1.deref(), &expr2.deref()) {
-                                (
-                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                ) => {
+                            match (
+                                &extract_string_from_expr(expr1),
+                                &extract_string_from_expr(expr2),
+                            ) {
+                                (Some(value1), Some(value2)) => {
                                     let pot = &mut self.pot.lock().unwrap();
                                     let meta = pot.add_message(
                                         None,
@@ -118,12 +120,12 @@ impl Visit for GettextVisitor<'_> {
                     },
                     "__np" | "npgettext" => match &args[..3] {
                         [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
-                            match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
-                                (
-                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value3, .. })),
-                                ) => {
+                            match (
+                                &extract_string_from_expr(expr1),
+                                &extract_string_from_expr(expr2),
+                                &extract_string_from_expr(expr3),
+                            ) {
+                                (Some(value1), Some(value2), Some(value3)) => {
                                     let pot = &mut self.pot.lock().unwrap();
                                     let meta = pot.add_message(
                                         None,
@@ -142,11 +144,11 @@ impl Visit for GettextVisitor<'_> {
                     },
                     "__d" | "dgettext" => match &args[..2] {
                         [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }] => {
-                            match (&expr1.deref(), &expr2.deref()) {
-                                (
-                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                ) => {
+                            match (
+                                &extract_string_from_expr(expr1),
+                                &extract_string_from_expr(expr2),
+                            ) {
+                                (Some(value1), Some(value2)) => {
                                     let pot = &mut self.pot.lock().unwrap();
                                     let meta = pot.add_message(
                                         Some(value1.to_string()),
@@ -161,12 +163,12 @@ impl Visit for GettextVisitor<'_> {
                     },
                     "__dn" | "dngettext" => match &args[..3] {
                         [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
-                            match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
-                                (
-                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value3, .. })),
-                                ) => {
+                            match (
+                                &extract_string_from_expr(expr1),
+                                &extract_string_from_expr(expr2),
+                                &extract_string_from_expr(expr3),
+                            ) {
+                                (Some(value1), Some(value2), Some(value3)) => {
                                     let pot = &mut self.pot.lock().unwrap();
                                     let meta = pot.add_message(
                                         Some(value1.to_string()),
@@ -185,12 +187,12 @@ impl Visit for GettextVisitor<'_> {
                     },
                     "__dp" | "dpgettext" => match &args[..3] {
                         [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }] => {
-                            match (&expr1.deref(), &expr2.deref(), &expr3.deref()) {
-                                (
-                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value3, .. })),
-                                ) => {
+                            match (
+                                &extract_string_from_expr(expr1),
+                                &extract_string_from_expr(expr2),
+                                &extract_string_from_expr(expr3),
+                            ) {
+                                (Some(value1), Some(value2), Some(value3)) => {
                                     let pot = &mut self.pot.lock().unwrap();
                                     let meta = pot.add_message(
                                         Some(value1.to_string()),
@@ -209,17 +211,12 @@ impl Visit for GettextVisitor<'_> {
                     "__dnp" | "dnpgettext" => match &args[..4] {
                         [ExprOrSpread { expr: expr1, .. }, ExprOrSpread { expr: expr2, .. }, ExprOrSpread { expr: expr3, .. }, ExprOrSpread { expr: expr4, .. }] => {
                             match (
-                                &expr1.deref(),
-                                &expr2.deref(),
-                                &expr3.deref(),
-                                &expr4.deref(),
+                                &extract_string_from_expr(expr1),
+                                &extract_string_from_expr(expr2),
+                                &extract_string_from_expr(expr3),
+                                &extract_string_from_expr(expr4),
                             ) {
-                                (
-                                    Expr::Lit(Lit::Str(Str { value: value1, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value2, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value3, .. })),
-                                    Expr::Lit(Lit::Str(Str { value: value4, .. })),
-                                ) => {
+                                (Some(value1), Some(value2), Some(value3), Some(value4)) => {
                                     let pot = &mut self.pot.lock().unwrap();
                                     let meta = pot.add_message(
                                         Some(value1.to_string()),
@@ -255,6 +252,17 @@ fn format_reference(cm: &Lrc<SourceMap>, span: &Span, references_relative_to: &P
     };
 
     format!("{}:{}", file, loc.line.to_string())
+}
+
+fn extract_string_from_expr(expr: &Expr) -> Option<String> {
+    match expr {
+        Expr::Lit(Lit::Str(Str { value, .. })) => Some(value.to_string()),
+        Expr::Tpl(Tpl { quasis, .. }) => match &quasis[..] {
+            [TplElement { cooked, .. }] => cooked.as_ref().map(|s| s.to_string()),
+            _ => None,
+        },
+        _ => None,
+    }
 }
 
 #[cfg(test)]
