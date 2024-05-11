@@ -22,11 +22,10 @@ pub struct GettextVisitor<'a> {
 }
 impl GettextVisitor<'_> {
     fn add_message_meta(&self, span: &Span, meta: &mut POTMessageMeta) {
-        meta.references.push(format_reference(
-            &self.cm,
-            span,
-            self.references_relative_to,
-        ));
+        match format_reference(&self.cm, span, self.references_relative_to) {
+            Some(reference) => meta.references.push(reference),
+            None => {}
+        }
 
         let mut comments = Vec::<Comment>::new();
 
@@ -41,7 +40,7 @@ impl GettextVisitor<'_> {
 
         for comment in comments {
             meta.extracted_comments
-                .push(comment.text.trim().to_string());
+                .push(String::from(comment.text.trim()));
         }
     }
 }
@@ -244,14 +243,21 @@ impl Visit for GettextVisitor<'_> {
     }
 }
 
-fn format_reference(cm: &Lrc<SourceMap>, span: &Span, references_relative_to: &PathBuf) -> String {
+fn format_reference(
+    cm: &Lrc<SourceMap>,
+    span: &Span,
+    references_relative_to: &PathBuf,
+) -> Option<String> {
     let loc = cm.lookup_char_pos(span.lo);
     let file = match pathdiff::diff_paths(loc.file.name.to_string(), references_relative_to) {
-        Some(relative) => relative.as_os_str().to_str().unwrap().to_string(),
-        None => loc.file.name.to_string(),
+        Some(relative) => relative.into_os_string().into_string(),
+        None => Ok(loc.file.name.to_string()),
     };
 
-    format!("{}:{}", file, loc.line.to_string())
+    match file {
+        Ok(file) => Some(format!("{}:{}", file, loc.line.to_string())),
+        Err(_) => return None,
+    }
 }
 
 fn extract_string_from_expr(expr: &Expr) -> Option<String> {

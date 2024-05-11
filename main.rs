@@ -63,7 +63,10 @@ fn run(args: Cli) {
         match walker::find_ts_files(path, exclude) {
             Ok(entries) => {
                 for entry in entries {
-                    bar.set_message(format!("Reading {}", entry.path().to_str().unwrap()));
+                    bar.set_message(format!(
+                        "Reading {}",
+                        entry.path().to_str().unwrap_or("unknown")
+                    ));
                     bar.inc(1);
 
                     walker::parse_file(
@@ -85,7 +88,7 @@ fn run(args: Cli) {
 
         bar.set_message(format!(
             "Writing POT files to {}",
-            output_folder.to_str().unwrap()
+            output_folder.to_str().unwrap_or("unknown")
         ));
         match fs::create_dir_all(&output_folder) {
             Ok(_) => {}
@@ -100,7 +103,10 @@ fn run(args: Cli) {
 
         domains.iter().for_each(|(domain, pot_file)| {
             let file_path = output_folder.join(format!("{}.pot", domain));
-            bar.set_message(format!("Writing {}", file_path.to_str().unwrap()));
+            bar.set_message(format!(
+                "Writing {}",
+                file_path.to_str().unwrap_or("unknown")
+            ));
             let mut file = match std::fs::File::create(file_path) {
                 Ok(file) => file,
                 Err(e) => {
@@ -108,12 +114,13 @@ fn run(args: Cli) {
                 }
             };
             match file.write_all(pot_file.to_string().as_bytes()) {
-                Ok(_) => {}
+                Ok(_) => {
+                    bar.inc(1);
+                }
                 Err(e) => {
                     panic!("Failed to write file: {}", e);
                 }
             };
-            bar.inc(1);
         });
 
         bar.finish_with_message("Done writing POT files");
