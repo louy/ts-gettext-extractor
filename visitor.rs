@@ -279,7 +279,6 @@ msgstr ""
 #: test.js:1
 msgid "Hello, world!"
 msgstr ""
-
 "#
         );
     }
@@ -300,7 +299,6 @@ msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
 msgstr[1] ""
-
 "#
         );
     }
@@ -324,7 +322,6 @@ msgstr ""
 msgctxt "menu"
 msgid "Hello, world!"
 msgstr ""
-
 "#
         );
     }
@@ -350,7 +347,6 @@ msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
 msgstr[1] ""
-
 "#
         );
     }
@@ -374,7 +370,6 @@ msgstr ""
 #: test.js:1
 msgid "Test message"
 msgstr ""
-
 "#
         );
     }
@@ -404,7 +399,6 @@ msgid "1 object"
 msgid_plural "%d objects"
 msgstr[0] ""
 msgstr[1] ""
-
 "#
         );
     }

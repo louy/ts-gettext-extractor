@@ -11,4 +11,3 @@ msgstr ""
 msgctxt "You won 1 coffee."
 msgid "You won %d coffees."
 msgstr ""
-

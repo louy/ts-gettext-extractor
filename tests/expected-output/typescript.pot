@@ -7,4 +7,3 @@ msgstr ""
 #: src/test.ts:5
 msgid "Hello there!"
 msgstr ""
-

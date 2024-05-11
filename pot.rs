@@ -112,14 +112,14 @@ impl POTFile {
 msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
 "#,
         );
 
         for (message, meta) in &self.messages {
+            result.push_str("\n");
             result.push_str(&meta.to_string());
             result.push_str(&message.to_string());
-            result.push_str("\n\n");
+            result.push_str("\n");
         }
         result
     }
@@ -225,7 +225,6 @@ msgstr ""
 #: src/main.rs
 msgid "Hello, world!"
 msgstr ""
-
 "#
         );
     }
@@ -250,7 +249,6 @@ msgid "%d person"
 msgid_plural "%d people"
 msgstr[0] ""
 msgstr[1] ""
-
 "#
         );
     }
@@ -292,7 +290,6 @@ msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] ""
 msgstr[1] ""
-
 "#
         );
     }
@@ -322,7 +319,6 @@ msgid ""
 "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat "
 "non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 msgstr ""
-
 "#
         );
     }
