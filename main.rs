@@ -3,6 +3,7 @@ use std::{
     fs,
     io::Write,
     sync::{Arc, Mutex},
+    time::Duration,
 };
 
 mod pot;
@@ -43,6 +44,8 @@ fn main() {
     run(args)
 }
 
+use indicatif::ProgressBar;
+
 fn run(args: Cli) {
     let default_domain = args.default_domain;
     let exclude = args.exclude;
@@ -50,40 +53,48 @@ fn run(args: Cli) {
     let output_folder = args.output_folder;
     let references_relative_to = args.references_relative_to.unwrap_or(output_folder.clone());
 
-    // println!(
-    //     "exclude: {:?}\npath: {:?}\noutput: {:?}\nreferences_relative_to: {:?}\ndefault_domain: {:?}",
-    //     exclude, path, output_folder, references_relative_to, default_domain
-    // );
-
     let pot = Arc::new(Mutex::new(pot::POT::new(default_domain)));
 
-    match walker::find_ts_files(path, exclude) {
-        Ok(entries) => {
-            for entry in entries {
-                println!("Processing {}", entry.path().to_str().unwrap());
-                walker::parse_file(&entry.into_path(), Arc::clone(&pot));
+    let _ = {
+        let bar = ProgressBar::new_spinner();
+        bar.enable_steady_tick(Duration::from_millis(100));
+        bar.set_message("Processing files...");
+
+        match walker::find_ts_files(path, exclude) {
+            Ok(entries) => {
+                for entry in entries {
+                    bar.set_message(format!("Processing {}", entry.path().to_str().unwrap()));
+                    bar.inc(1);
+
+                    walker::parse_file(&entry.into_path(), Arc::clone(&pot));
+                }
+            }
+            Err(e) => {
+                panic!("Error reading path: {}", e);
             }
         }
-        Err(e) => {
-            panic!("Error reading path: {}", e);
-        }
-    }
+        bar.finish_with_message("Done processing files");
+    };
+    let _ = {
+        let bar = ProgressBar::new_spinner();
+        bar.enable_steady_tick(Duration::from_millis(100));
+        bar.set_message("Writing POT files...");
 
-    println!("Writing pot files to {}", output_folder.to_str().unwrap());
-    match fs::create_dir_all(&output_folder) {
-        Ok(_) => {}
-        Err(e) => {
-            panic!("Error creating output folder: {}", e);
+        println!("Writing pot files to {}", output_folder.to_str().unwrap());
+        match fs::create_dir_all(&output_folder) {
+            Ok(_) => {}
+            Err(e) => {
+                panic!("Error creating output folder: {}", e);
+            }
         }
-    }
 
-    pot.lock()
-        .unwrap()
-        .domains
-        .iter()
-        .for_each(|(domain, pot_file)| {
+        let domains = &pot.lock().unwrap().domains;
+
+        bar.set_length(domains.len() as u64);
+
+        domains.iter().for_each(|(domain, pot_file)| {
             let file_path = output_folder.join(format!("{}.pot", domain));
-            println!("Writing {}", file_path.to_str().unwrap());
+            bar.set_message(format!("Writing {}", file_path.to_str().unwrap()));
             let mut file = match std::fs::File::create(file_path) {
                 Ok(file) => file,
                 Err(e) => {
@@ -96,9 +107,11 @@ fn run(args: Cli) {
                     panic!("Failed to write file: {}", e);
                 }
             };
+            bar.inc(1);
         });
 
-    println!("Done");
+        bar.finish_with_message("Done");
+    };
 }
 
 #[cfg(test)]

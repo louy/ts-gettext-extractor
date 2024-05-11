@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
 indexmap = "2.2.6"
+indicatif = "0.17.8"
 swc_atoms = "0.6.7"
 swc_common = { version = "0.33.26", features = ["tty-emitter"] }
 swc_ecma_ast = "0.113.1"
