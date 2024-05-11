@@ -1,5 +1,6 @@
 use std::{
     ops::Deref,
+    path::PathBuf,
     sync::{Arc, Mutex},
 };
 
@@ -17,10 +18,15 @@ pub struct GettextVisitor<'a> {
     pub pot: Arc<Mutex<crate::pot::POT>>,
     pub cm: Lrc<SourceMap>,
     pub comments: Option<&'a dyn Comments>,
+    pub references_relative_to: &'a PathBuf,
 }
 impl GettextVisitor<'_> {
     fn add_message_meta(&self, span: &Span, meta: &mut POTMessageMeta) {
-        meta.references.push(format_reference(&self.cm, span));
+        meta.references.push(format_reference(
+            &self.cm,
+            span,
+            self.references_relative_to,
+        ));
 
         let mut comments = Vec::<Comment>::new();
 
@@ -239,9 +245,16 @@ impl Visit for GettextVisitor<'_> {
     }
 }
 
-fn format_reference(cm: &Lrc<SourceMap>, span: &Span) -> String {
+fn format_reference(cm: &Lrc<SourceMap>, span: &Span, references_relative_to: &PathBuf) -> String {
     let loc = cm.lookup_char_pos(span.lo);
-    format!("{}:{}", &loc.file.name.to_string(), loc.line.to_string())
+    format!(
+        "{}:{}",
+        &match pathdiff::diff_paths(loc.file.name.to_string(), references_relative_to) {
+            Some(relative) => relative.as_os_str().to_str().unwrap().to_string(),
+            None => loc.file.name.to_string(),
+        },
+        loc.line.to_string()
+    )
 }
 
 #[cfg(test)]

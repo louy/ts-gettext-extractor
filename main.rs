@@ -66,7 +66,11 @@ fn run(args: Cli) {
                     bar.set_message(format!("Processing {}", entry.path().to_str().unwrap()));
                     bar.inc(1);
 
-                    walker::parse_file(&entry.into_path(), Arc::clone(&pot));
+                    walker::parse_file(
+                        &entry.into_path(),
+                        Arc::clone(&pot),
+                        &references_relative_to,
+                    );
                 }
             }
             Err(e) => {

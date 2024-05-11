@@ -50,7 +50,11 @@ use swc_ecma_parser::{lexer::Lexer, EsConfig, Parser, StringInput, Syntax, TsCon
 use swc_ecma_visit::VisitWith;
 
 /// Extract gettext strings from a source file
-pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
+pub fn parse_file(
+    path: &PathBuf,
+    pot: Arc<Mutex<crate::pot::POT>>,
+    references_relative_to: &PathBuf,
+) {
     let syntax = match path.extension() {
         Some(os_str) => match os_str.to_str() {
             Some("d.ts") => Syntax::Typescript(TsConfig {
@@ -108,6 +112,7 @@ pub fn parse_file(path: &PathBuf, pot: Arc<Mutex<crate::pot::POT>>) {
         pot: pot,
         cm: Lrc::clone(&cm),
         comments: Some(&comments),
+        references_relative_to,
     };
 
     module.visit_with(&mut visitor);
