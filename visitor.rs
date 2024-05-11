@@ -269,7 +269,12 @@ mod tests {
         parse("test.js", r#"__("Hello, world!");"#, Arc::clone(&pot));
         assert_eq!(
             pot.lock().unwrap().to_string(None).unwrap(),
-            r#"#: test.js:1
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: test.js:1
 msgid "Hello, world!"
 msgstr ""
 
@@ -283,7 +288,12 @@ msgstr ""
         parse("test.js", r#"__n("1 file", "%d files");"#, Arc::clone(&pot));
         assert_eq!(
             pot.lock().unwrap().to_string(None).unwrap(),
-            r#"#: test.js:1
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: test.js:1
 msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
@@ -303,7 +313,12 @@ msgstr[1] ""
         );
         assert_eq!(
             pot.lock().unwrap().to_string(None).unwrap(),
-            r#"#: test.js:1
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: test.js:1
 msgctxt "menu"
 msgid "Hello, world!"
 msgstr ""
@@ -322,7 +337,12 @@ msgstr ""
         );
         assert_eq!(
             pot.lock().unwrap().to_string(None).unwrap(),
-            r#"#: test.js:1
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: test.js:1
 msgctxt "menu"
 msgid "1 file"
 msgid_plural "%d files"
@@ -343,7 +363,12 @@ msgstr[1] ""
         );
         assert_eq!(
             pot.lock().unwrap().to_string(None).unwrap(),
-            r#"#. Test comment
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Test comment
 #: test.js:1
 msgid "Test message"
 msgstr ""
@@ -366,7 +391,12 @@ msgstr ""
         );
         assert_eq!(
             pot.lock().unwrap().to_string(None).unwrap(),
-            r#"#. Test comment
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Test comment
 #: file.tsx:3
 msgid "1 object"
 msgid_plural "%d objects"

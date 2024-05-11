@@ -161,11 +161,12 @@ mod tests {
         {
             println!("{:?}", entry.path());
             let actual = fs::read_to_string(entry.path()).unwrap();
-            let expected = fs::read_to_string(format!(
+            let expected_file = format!(
                 "./tests/expected-output/{}",
                 entry.file_name().to_str().unwrap()
-            ))
-            .unwrap();
+            );
+            let expected = fs::read_to_string(&expected_file)
+                .expect(&format!("Missing expected output file: {}", &expected_file));
             assert_eq!(actual, expected);
         }
     }

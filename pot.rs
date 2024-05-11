@@ -105,6 +105,17 @@ pub struct POTFile {
 impl POTFile {
     pub fn to_string(&self) -> String {
         let mut result = String::new();
+
+        // Add headers
+        result.push_str(
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+"#,
+        );
+
         for (message, meta) in &self.messages {
             result.push_str(&meta.to_string());
             result.push_str(&message.to_string());
@@ -206,7 +217,12 @@ mod tests {
         );
         assert_eq!(
             pot.to_string(None).unwrap(),
-            r#"#: src/main.rs
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/main.rs
 msgid "Hello, world!"
 msgstr ""
 
@@ -224,7 +240,12 @@ msgstr ""
         );
         assert_eq!(
             pot.to_string(None).unwrap(),
-            r#"#: src/main.rs
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/main.rs
 msgid "%d person"
 msgid_plural "%d people"
 msgstr[0] ""
@@ -255,7 +276,12 @@ msgstr[1] ""
         );
         assert_eq!(
             pot.to_string(None).unwrap(),
-            r#"#: src/main.rs
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/main.rs
 msgctxt "menu"
 msgid "File"
 msgstr ""
@@ -282,7 +308,12 @@ msgstr[1] ""
         );
         assert_eq!(
             pot.to_string(None).unwrap(),
-            r#"#: src/main.rs
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/main.rs
 msgid ""
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
 "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, "
