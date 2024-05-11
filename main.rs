@@ -58,12 +58,12 @@ fn run(args: Cli) {
     let _ = {
         let bar = ProgressBar::new_spinner();
         bar.enable_steady_tick(Duration::from_millis(100));
-        bar.set_message("Processing files...");
+        bar.set_message("Reading files...");
 
         match walker::find_ts_files(path, exclude) {
             Ok(entries) => {
                 for entry in entries {
-                    bar.set_message(format!("Processing {}", entry.path().to_str().unwrap()));
+                    bar.set_message(format!("Reading {}", entry.path().to_str().unwrap()));
                     bar.inc(1);
 
                     walker::parse_file(
@@ -77,14 +77,16 @@ fn run(args: Cli) {
                 panic!("Error reading path: {}", e);
             }
         }
-        bar.finish_with_message("Done processing files");
+        bar.finish_with_message("Done reading source files");
     };
     let _ = {
         let bar = ProgressBar::new_spinner();
         bar.enable_steady_tick(Duration::from_millis(100));
-        bar.set_message("Writing POT files...");
 
-        println!("Writing pot files to {}", output_folder.to_str().unwrap());
+        bar.set_message(format!(
+            "Writing POT files to {}",
+            output_folder.to_str().unwrap()
+        ));
         match fs::create_dir_all(&output_folder) {
             Ok(_) => {}
             Err(e) => {
@@ -114,7 +116,7 @@ fn run(args: Cli) {
             bar.inc(1);
         });
 
-        bar.finish_with_message("Done");
+        bar.finish_with_message("Done writing POT files");
     };
 }
 
