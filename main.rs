@@ -70,7 +70,6 @@ fn run(args: Cli) {
     }
 
     println!("Writing pot files to {}", output_folder.to_str().unwrap());
-    let _ = fs::remove_dir_all(&output_folder);
     match fs::create_dir_all(&output_folder) {
         Ok(_) => {}
         Err(e) => {
@@ -117,6 +116,7 @@ mod tests {
 
     #[test]
     fn verify_snapshot() {
+        let _ = fs::remove_dir_all(&"./tests/output/");
         let args = Cli::parse_from([
             "",
             "--path",
