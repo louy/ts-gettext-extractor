@@ -3,14 +3,6 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/test.ts:7
-msgid "Test backticks"
-msgstr ""
-
-#: src/test.ts:8
-msgid "Test backticks with __d"
-msgstr ""
-
 #: src/index.jsx:9
 msgctxt "title"
 msgid "App"
@@ -30,4 +22,12 @@ msgid ""
 "ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea "
 "voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem "
 "eum fugiat quo voluptas nulla pariatur?"
+msgstr ""
+
+#: src/test.ts:7
+msgid "Test backticks"
+msgstr ""
+
+#: src/test.ts:8
+msgid "Test backticks with __d"
 msgstr ""

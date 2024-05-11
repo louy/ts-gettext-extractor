@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
-indexmap = "2.2.6"
 indicatif = "0.17.8"
 pathdiff = "0.2.1"
 swc_atoms = "0.6.7"

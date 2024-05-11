@@ -1,8 +1,9 @@
-use indexmap::IndexMap;
 // See https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html for details about a POT file format
 
+use std::collections::BTreeMap;
+
 /// An individual message in a POT file
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum POTMessageID {
     Singular(
         /// msgctx
@@ -18,6 +19,60 @@ pub enum POTMessageID {
         /// msgid_plural
         String,
     ),
+}
+impl PartialOrd for POTMessageID {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for POTMessageID {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        // Compare msgctx
+        if let (
+            POTMessageID::Singular(Some(ctx1), _) | POTMessageID::Plural(Some(ctx1), _, _),
+            POTMessageID::Singular(Some(ctx2), _) | POTMessageID::Plural(Some(ctx2), _, _),
+        ) = (self, other)
+        {
+            match ctx1.cmp(ctx2) {
+                std::cmp::Ordering::Equal => {}
+                other => return other,
+            };
+        }
+        if let POTMessageID::Singular(Some(_), _) | POTMessageID::Plural(Some(_), _, _) = self {
+            return std::cmp::Ordering::Less;
+        }
+        if let POTMessageID::Singular(Some(_), _) | POTMessageID::Plural(Some(_), _, _) = other {
+            return std::cmp::Ordering::Greater;
+        }
+
+        // Compare msgid
+        if let (
+            POTMessageID::Singular(None, msgid1) | POTMessageID::Plural(None, msgid1, _),
+            POTMessageID::Singular(None, msgid2) | POTMessageID::Plural(None, msgid2, _),
+        ) = (self, other)
+        {
+            match msgid1.cmp(msgid2) {
+                std::cmp::Ordering::Equal => {}
+                other => return other,
+            };
+        }
+
+        // Compare msgid_plural
+        if let (POTMessageID::Plural(None, _, _), POTMessageID::Singular(None, _)) = (self, other) {
+            return std::cmp::Ordering::Greater;
+        }
+        if let (POTMessageID::Singular(None, _), POTMessageID::Plural(None, _, _)) = (self, other) {
+            return std::cmp::Ordering::Less;
+        }
+
+        if let (POTMessageID::Plural(None, _, msgid1), POTMessageID::Plural(None, _, msgid2)) =
+            (self, other)
+        {
+            return msgid1.cmp(msgid2);
+        }
+
+        return std::cmp::Ordering::Equal;
+    }
 }
 impl POTMessageID {
     fn convert_to_string(&self) -> String {
@@ -99,7 +154,7 @@ impl POTMessageMeta {
 
 #[derive(Debug)]
 pub struct POTFile {
-    messages: IndexMap<POTMessageID, POTMessageMeta>,
+    messages: BTreeMap<POTMessageID, POTMessageMeta>,
 }
 impl POTFile {
     pub fn convert_to_string(&self) -> String {
@@ -124,7 +179,7 @@ msgstr ""
     }
     pub fn new() -> Self {
         Self {
-            messages: IndexMap::new(),
+            messages: BTreeMap::new(),
         }
     }
 }
@@ -132,13 +187,13 @@ msgstr ""
 #[derive(Debug)]
 pub struct POT {
     default_domain: String,
-    pub domains: IndexMap<String, POTFile>,
+    pub domains: BTreeMap<String, POTFile>,
 }
 impl POT {
     pub fn new(default_domain: impl Into<Option<String>>) -> Self {
         Self {
             default_domain: default_domain.into().unwrap_or("default".to_string()),
-            domains: IndexMap::new(),
+            domains: BTreeMap::new(),
         }
     }
 
@@ -278,15 +333,15 @@ msgstr ""
 
 #: src/main.rs
 msgctxt "menu"
-msgid "File"
-msgstr ""
-
-#: src/main.rs
-msgctxt "menu"
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/main.rs
+msgctxt "menu"
+msgid "File"
+msgstr ""
 "#
         );
     }
