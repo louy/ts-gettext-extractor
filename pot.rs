@@ -20,7 +20,7 @@ pub enum POTMessageID {
     ),
 }
 impl POTMessageID {
-    fn to_string(&self) -> String {
+    fn convert_to_string(&self) -> String {
         let mut result = String::new();
         match self {
             POTMessageID::Singular(None, msg) => {
@@ -71,27 +71,26 @@ impl POTMessageMeta {
         }
     }
 
-    fn to_string(&self) -> String {
+    fn convert_to_string(&self) -> String {
         let mut result = String::new();
-        match self {
-            POTMessageMeta {
-                references,
-                translator_comments,
-                extracted_comments,
-                flags,
-            } => {
-                for comment in translator_comments {
-                    result.push_str(&format!("#  {}\n", comment));
-                }
-                for comment in extracted_comments {
-                    result.push_str(&format!("#. {}\n", comment));
-                }
-                for reference in references {
-                    result.push_str(&format!("#: {}\n", reference));
-                }
-                for flag in flags {
-                    result.push_str(&format!("#, {}\n", flag));
-                }
+        let POTMessageMeta {
+            references,
+            translator_comments,
+            extracted_comments,
+            flags,
+        } = self;
+        {
+            for comment in translator_comments {
+                result.push_str(&format!("#  {}\n", comment));
+            }
+            for comment in extracted_comments {
+                result.push_str(&format!("#. {}\n", comment));
+            }
+            for reference in references {
+                result.push_str(&format!("#: {}\n", reference));
+            }
+            for flag in flags {
+                result.push_str(&format!("#, {}\n", flag));
             }
         }
         result
@@ -103,7 +102,7 @@ pub struct POTFile {
     messages: IndexMap<POTMessageID, POTMessageMeta>,
 }
 impl POTFile {
-    pub fn to_string(&self) -> String {
+    pub fn convert_to_string(&self) -> String {
         let mut result = String::new();
 
         // Add headers
@@ -116,10 +115,10 @@ msgstr ""
         );
 
         for (message, meta) in &self.messages {
-            result.push_str("\n");
-            result.push_str(&meta.to_string());
-            result.push_str(&message.to_string());
-            result.push_str("\n");
+            result.push('\n');
+            result.push_str(&meta.convert_to_string());
+            result.push_str(&message.convert_to_string());
+            result.push('\n');
         }
         result
     }
@@ -159,11 +158,9 @@ impl POT {
 
     #[allow(dead_code)]
     pub fn to_string(&self, domain: Option<&str>) -> Option<String> {
-        if let Some(file) = self.domains.get(domain.unwrap_or(&self.default_domain)) {
-            Some(file.to_string())
-        } else {
-            None
-        }
+        self.domains
+            .get(domain.unwrap_or(&self.default_domain))
+            .map(|file| file.convert_to_string())
     }
 }
 

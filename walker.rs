@@ -1,11 +1,11 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 pub fn find_ts_files(
     path: PathBuf,
     exclude: Vec<String>,
 ) -> Result<impl Iterator<Item = walkdir::DirEntry>, walkdir::Error> {
-    Ok(WalkDir::new(&path)
+    Ok(WalkDir::new(path)
         .into_iter()
         .filter_map(|entry| entry.ok())
         .filter(|entry| {
@@ -25,13 +25,9 @@ pub fn find_ts_files(
                         false
                     } else {
                         // Filter out all files with extensions other than `ts` or `tsx` or `js` or `jsx`
-                        if entry.path().extension().map_or(false, |ext| {
+                        entry.path().extension().map_or(false, |ext| {
                             ext == "ts" || ext == "tsx" || ext == "js" || ext == "jsx"
-                        }) {
-                            true
-                        } else {
-                            false
-                        }
+                        })
                     }
                 })
                 .unwrap_or(false)
@@ -50,11 +46,7 @@ use swc_ecma_parser::{lexer::Lexer, EsConfig, Parser, StringInput, Syntax, TsCon
 use swc_ecma_visit::VisitWith;
 
 /// Extract gettext strings from a source file
-pub fn parse_file(
-    path: &PathBuf,
-    pot: Arc<Mutex<crate::pot::POT>>,
-    references_relative_to: &PathBuf,
-) {
+pub fn parse_file(path: &Path, pot: Arc<Mutex<crate::pot::POT>>, references_relative_to: &PathBuf) {
     let syntax = match path.extension() {
         Some(os_str) => match os_str.to_str() {
             Some("d.ts") => Syntax::Typescript(TsConfig {
@@ -109,7 +101,7 @@ pub fn parse_file(
         .expect("failed to parser module");
 
     let mut visitor = crate::visitor::GettextVisitor {
-        pot: pot,
+        pot,
         cm: Lrc::clone(&cm),
         comments: Some(&comments),
         references_relative_to,

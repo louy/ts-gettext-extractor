@@ -55,7 +55,7 @@ fn run(args: Cli) {
 
     let pot = Arc::new(Mutex::new(pot::POT::new(default_domain)));
 
-    let _ = {
+    {
         let bar = ProgressBar::new_spinner();
         bar.enable_steady_tick(Duration::from_millis(100));
         bar.set_message("Reading files...");
@@ -82,7 +82,7 @@ fn run(args: Cli) {
         }
         bar.finish_with_message("Done reading source files");
     };
-    let _ = {
+    {
         let bar = ProgressBar::new_spinner();
         bar.enable_steady_tick(Duration::from_millis(100));
 
@@ -113,7 +113,7 @@ fn run(args: Cli) {
                     panic!("Failed to create file: {}", e);
                 }
             };
-            match file.write_all(pot_file.to_string().as_bytes()) {
+            match file.write_all(pot_file.convert_to_string().as_bytes()) {
                 Ok(_) => {
                     bar.inc(1);
                 }
@@ -142,7 +142,7 @@ mod tests {
 
     #[test]
     fn verify_snapshot() {
-        let _ = fs::remove_dir_all(&"./tests/output/");
+        let _ = fs::remove_dir_all("./tests/output/");
         let args = Cli::parse_from([
             "",
             "--path",
@@ -155,7 +155,7 @@ mod tests {
             "./tests",
         ]);
         run(args);
-        for entry in WalkDir::new(&"./tests/output/")
+        for entry in WalkDir::new("./tests/output/")
             .into_iter()
             .filter_map(|entry| entry.ok())
             .filter(|entry| {
@@ -173,7 +173,7 @@ mod tests {
                 entry.file_name().to_str().unwrap()
             );
             let expected = fs::read_to_string(&expected_file)
-                .expect(&format!("Missing expected output file: {}", &expected_file));
+                .unwrap_or_else(|_| panic!("Missing expected output file: {}", &expected_file));
             assert_eq!(actual, expected);
         }
     }
