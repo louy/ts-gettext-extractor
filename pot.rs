@@ -406,4 +406,30 @@ msgstr ""
 "#
         );
     }
+
+    #[test]
+    fn it_doesnt_break_on_multiline_comment() {
+        let mut pot = POT::new(None);
+        let meta = pot.add_message(None, POTMessageID::Singular(None, "Hi friend".to_string()));
+        meta.extracted_comments.push(String::from(
+            r#"
+This is a not so long comment.
+However, it has a line break in it.
+This might tip your tool off.
+"#,
+        ));
+        assert_eq!(
+            pot.to_string(None).unwrap(),
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. This is a not so long comment. However, it has a line break in it. This
+#. might tip your tool off. 
+msgid "Hi friend"
+msgstr ""
+"#
+        );
+    }
 }
