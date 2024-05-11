@@ -143,16 +143,16 @@ impl POTMessageMeta {
         } = self;
         {
             for comment in translator_comments {
-                result.push_str(&format!("#  {}\n", comment));
+                result.push_str(&format_po_comment(&' ', comment));
             }
             for comment in extracted_comments {
-                result.push_str(&format!("#. {}\n", comment));
+                result.push_str(&format_po_comment(&'.', comment));
             }
             for reference in references {
-                result.push_str(&format!("#: {}\n", reference));
+                result.push_str(&format_po_comment(&':', reference));
             }
             for flag in flags {
-                result.push_str(&format!("#, {}\n", flag));
+                result.push_str(&format_po_comment(&',', flag));
             }
         }
         result
@@ -246,6 +246,30 @@ fn format_po_message(key: &str, msg: &str) -> std::string::String {
         result
     } else {
         format!("{} \"{}\"", key, msg)
+    }
+}
+
+fn format_po_comment(prefix: &char, msg: &str) -> std::string::String {
+    // If line will exceed max length (including prefix, hash and space)
+    let line_prefix = format!("#{} ", prefix);
+    if msg.len() > MAX_LINE_LENGTH - line_prefix.len() {
+        let mut result = String::new();
+        let mut line = String::new();
+        line.push_str(&line_prefix);
+        for word in msg.split_whitespace() {
+            if (line.len() + word.len() + 1) > MAX_LINE_LENGTH {
+                result.push_str(line.trim());
+                result.push('\n');
+                line = String::new();
+                line.push_str(&line_prefix);
+            }
+            line.push_str(&format!("{} ", word));
+        }
+        result.push_str(&line);
+        result.push('\n');
+        result
+    } else {
+        format!("{}{}\n", line_prefix, msg)
     }
 }
 

@@ -3,7 +3,9 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#. Another comment to be extracted. However, this time it's a very long comment that can span multiple lines and might be broken into multiple lines in the output `.po` file.
+#. Another comment to be extracted. However, this time it's a very long comment
+#. that can span multiple lines and might be broken into multiple lines in the
+#. output `.po` file. 
 #: src/test.ts:5
 msgid "Hello there!"
 msgstr ""
