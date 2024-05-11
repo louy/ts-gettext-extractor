@@ -1,7 +1,7 @@
 // To update snapshots, run:
 // cargo run -- --path ./tests/src/ --output-folder ./tests/expected-output/
 
-export const App = () => {
+export const App =React.memo(() => {
   const number = useMemo(() => Math.round(10 * Math.random()), []);
   return (
     <>
@@ -16,4 +16,4 @@ export const App = () => {
     </main>
     </>
   )
-}
+});

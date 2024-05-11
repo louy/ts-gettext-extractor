@@ -10,7 +10,7 @@ use swc_common::{
 };
 use swc_common::{SourceMap, Span};
 use swc_ecma_ast::*;
-use swc_ecma_visit::{noop_visit_type, Visit};
+use swc_ecma_visit::{noop_visit_type, Visit, VisitWith};
 
 use crate::pot::{POTMessageID, POTMessageMeta};
 
@@ -242,6 +242,8 @@ impl Visit for GettextVisitor<'_> {
             },
             _ => {}
         }
+
+        call.visit_children_with(self);
     }
 }
 
