@@ -79,29 +79,36 @@ impl POTMessageID {
         let mut result = String::new();
         match self {
             POTMessageID::Singular(None, msg) => {
-                result.push_str(&format!("msgid {}\nmsgstr \"\"", format_message(msg)));
+                result.push_str(&format_po_message("msgid", msg));
+                result.push('\n');
+                result.push_str(&format_po_message("msgstr", ""));
             }
             POTMessageID::Plural(None, msg1, msg2) => {
-                result.push_str(&format!(
-                    "msgid {}\nmsgid_plural {}\nmsgstr[0] \"\"\nmsgstr[1] \"\"",
-                    format_message(msg1),
-                    format_message(msg2)
-                ));
+                result.push_str(&format_po_message("msgid", msg1));
+                result.push('\n');
+                result.push_str(&format_po_message("msgid_plural", msg2));
+                result.push('\n');
+                result.push_str(&format_po_message("msgstr[0]", ""));
+                result.push('\n');
+                result.push_str(&format_po_message("msgstr[1]", ""));
             }
             POTMessageID::Singular(Some(ctx), msg) => {
-                result.push_str(&format!(
-                    "msgctxt \"{}\"\nmsgid {}\nmsgstr \"\"",
-                    ctx,
-                    format_message(msg)
-                ));
+                result.push_str(&format_po_message("msgctxt", ctx));
+                result.push('\n');
+                result.push_str(&format_po_message("msgid", msg));
+                result.push('\n');
+                result.push_str(&format_po_message("msgstr", ""));
             }
             POTMessageID::Plural(Some(ctx), msg1, msg2) => {
-                result.push_str(&format!(
-                    "msgctxt \"{}\"\nmsgid {}\nmsgid_plural {}\nmsgstr[0] \"\"\nmsgstr[1] \"\"",
-                    ctx,
-                    format_message(msg1),
-                    format_message(msg2)
-                ));
+                result.push_str(&format_po_message("msgctxt", ctx));
+                result.push('\n');
+                result.push_str(&format_po_message("msgid", msg1));
+                result.push('\n');
+                result.push_str(&format_po_message("msgid_plural", msg2));
+                result.push('\n');
+                result.push_str(&format_po_message("msgstr[0]", ""));
+                result.push('\n');
+                result.push_str(&format_po_message("msgstr[1]", ""));
             }
         }
         result
@@ -221,10 +228,11 @@ impl POT {
 
 const MAX_LINE_LENGTH: usize = 80;
 
-fn format_message(msg: &str) -> std::string::String {
-    if msg.len() > 80 {
+fn format_po_message(key: &str, msg: &str) -> std::string::String {
+    // If line will exceed max length (including quotes & space)
+    if msg.len() > MAX_LINE_LENGTH - key.len() - 3 {
         let mut result = String::new();
-        result.push_str("\"\"\n");
+        result.push_str(&format!("{} \"\"\n", key));
         let mut line = String::new();
         for word in msg.split_whitespace() {
             // minus 3 for the quotes and trailing space
@@ -237,7 +245,7 @@ fn format_message(msg: &str) -> std::string::String {
         result.push_str(&format!("\"{}\"", line.trim()));
         result
     } else {
-        format!("\"{}\"", msg)
+        format!("{} \"{}\"", key, msg)
     }
 }
 
