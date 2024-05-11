@@ -3,11 +3,12 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/index.jsx:15
-msgctxt "You won 1 coffee."
-msgid "You won %d coffees."
-msgstr ""
-
 #: src/index.jsx:14
 msgid "Today is your lucky day!"
 msgstr ""
+
+#: src/index.jsx:15
+msgid "You won 1 coffee."
+msgid_plural "You won %d coffees."
+msgstr[0] ""
+msgstr[1] ""
