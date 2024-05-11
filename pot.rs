@@ -146,16 +146,6 @@ impl POT {
             .or_insert_with(POTMessageMeta::new)
     }
 
-    pub fn add_message_reference(
-        &mut self,
-        domain: Option<String>,
-        message: POTMessageID,
-        reference: String,
-    ) {
-        let meta = self.add_message(domain, message);
-        meta.references.push(reference.to_string());
-    }
-
     #[allow(dead_code)]
     pub fn to_string(&self, domain: Option<&str>) -> Option<String> {
         if let Some(file) = self.domains.get(domain.unwrap_or(&self.default_domain)) {
@@ -195,10 +185,21 @@ mod tests {
 
     use super::*;
 
+    fn add_message_reference(
+        pot: &mut POT,
+        domain: Option<String>,
+        message: POTMessageID,
+        reference: String,
+    ) {
+        let meta = pot.add_message(domain, message);
+        meta.references.push(reference.to_string());
+    }
+
     #[test]
     fn generates_file_with_singular_message() {
         let mut pot = POT::new(None);
-        pot.add_message_reference(
+        add_message_reference(
+            &mut pot,
             None,
             POTMessageID::Singular(None, "Hello, world!".to_string()),
             "src/main.rs".to_string(),
@@ -215,7 +216,8 @@ msgstr ""
     #[test]
     fn generates_file_with_plural_message() {
         let mut pot = POT::new(None);
-        pot.add_message_reference(
+        add_message_reference(
+            &mut pot,
             None,
             POTMessageID::Plural(None, "%d person".to_string(), "%d people".to_string()),
             "src/main.rs".to_string(),
@@ -235,12 +237,14 @@ msgstr[1] ""
     #[test]
     fn generates_file_with_context_messages() {
         let mut pot = POT::new(None);
-        pot.add_message_reference(
+        add_message_reference(
+            &mut pot,
             None,
             POTMessageID::Singular(Some("menu".to_string()), "File".to_string()),
             "src/main.rs".to_string(),
         );
-        pot.add_message_reference(
+        add_message_reference(
+            &mut pot,
             None,
             POTMessageID::Plural(
                 Some("menu".to_string()),
@@ -270,7 +274,8 @@ msgstr[1] ""
     #[test]
     fn it_breaks_long_ids_into_multiple_lines() {
         let mut pot = POT::new(None);
-        pot.add_message_reference(
+        add_message_reference(
+            &mut pot,
             None,
             POTMessageID::Singular(None, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string()),
             "src/main.rs".to_string(),

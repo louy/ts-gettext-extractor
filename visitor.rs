@@ -247,14 +247,12 @@ impl Visit for GettextVisitor<'_> {
 
 fn format_reference(cm: &Lrc<SourceMap>, span: &Span, references_relative_to: &PathBuf) -> String {
     let loc = cm.lookup_char_pos(span.lo);
-    format!(
-        "{}:{}",
-        &match pathdiff::diff_paths(loc.file.name.to_string(), references_relative_to) {
-            Some(relative) => relative.as_os_str().to_str().unwrap().to_string(),
-            None => loc.file.name.to_string(),
-        },
-        loc.line.to_string()
-    )
+    let file = match pathdiff::diff_paths(loc.file.name.to_string(), references_relative_to) {
+        Some(relative) => relative.as_os_str().to_str().unwrap().to_string(),
+        None => loc.file.name.to_string(),
+    };
+
+    format!("{}:{}", file, loc.line.to_string())
 }
 
 #[cfg(test)]
@@ -388,6 +386,7 @@ msgstr[1] ""
             pot,
             cm: Lrc::clone(&cm),
             comments: Some(&comments),
+            references_relative_to: &PathBuf::from("."),
         };
         let fm = cm.new_source_file(FileName::Custom(filename.into()), source.into());
         let lexer = Lexer::new(

@@ -144,6 +144,8 @@ mod tests {
             "./tests/output/",
             "--default-domain",
             "test",
+            "--references-relative-to",
+            "./tests",
         ]);
         run(args);
         for entry in WalkDir::new(&"./tests/output/")
