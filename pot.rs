@@ -149,7 +149,7 @@ impl POTMessageMeta {
                 result.push_str(&format_po_comment(&'.', comment));
             }
             for reference in references {
-                result.push_str(&format_po_comment(&':', reference));
+                result.push_str(&format!("#: {}\n", reference));
             }
             for flag in flags {
                 result.push_str(&format_po_comment(&',', flag));
@@ -427,6 +427,28 @@ msgstr ""
 
 #. This is a not so long comment. However, it has a line break in it. This
 #. might tip your tool off. 
+msgid "Hi friend"
+msgstr ""
+"#
+        );
+    }
+
+    #[test]
+    fn it_doesnt_break_on_very_long_reference_filename() {
+        let mut pot = POT::new(None);
+        let meta = pot.add_message(None, POTMessageID::Singular(None, "Hi friend".to_string()));
+        meta.references.push(
+            "path/to/very/long/filename/that/shouldnt/be/broken/here/we/go/really/this/time/my_super_special_file_v3_FINAL_FINAL_NO_EDIT.tsx:246912631923213"
+                .to_string(),
+        );
+        assert_eq!(
+            pot.to_string(None).unwrap(),
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: path/to/very/long/filename/that/shouldnt/be/broken/here/we/go/really/this/time/my_super_special_file_v3_FINAL_FINAL_NO_EDIT.tsx:246912631923213
 msgid "Hi friend"
 msgstr ""
 "#
