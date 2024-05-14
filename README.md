@@ -57,3 +57,11 @@ This WILL NOT be extracted:
 /* ❌ A comment that won't be extracted */
 const myText = __('My text');
 ```
+
+## Development
+This library is written in rust, so you'll need rust & cargo installed. We also use `cargo-make` so make sure to install it:
+```console
+$ cargo install --force cargo-make
+```
+
+Look at [Makefile.toml](/Makefile.toml) for list of tools & tasks we use.

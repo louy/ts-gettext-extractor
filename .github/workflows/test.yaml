@@ -28,7 +28,5 @@ jobs:
             ~/.cargo/git/db
             target
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.lock') }}
-      - name: Build
-        run: cargo build --verbose
-      - name: Run tests
-        run: cargo test --verbose
+      - run: cargo install --force cargo-make
+      - run: cargo make test
