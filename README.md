@@ -67,4 +67,4 @@ $ cargo install --force cargo-make
 Look at [Makefile.toml](/Makefile.toml) for list of tools & tasks we use.
 
 ## Release
-Release is done through the [release workflow](/.github/workflows/release.yaml). To make a new release just bump the version `yarn bump patch|minor|major` and `git push --follow-tags`.
+Release is done through the [cd workflow](/.github/workflows/cd.yaml). To make a new release just bump the version `yarn bump patch|minor|major` and `git push --follow-tags`.

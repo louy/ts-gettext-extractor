@@ -1,13 +1,15 @@
-name: Build
-
 on:
+  pull_request:
   push:
     branches:
       - main
+env:
+  CARGO_TERM_COLOR: always
+
+name: CI
 
 jobs:
-  build-binary:
-    name: Build binary
+  build:
     permissions: 
       contents: read
     runs-on: ${{ matrix.build.os }}
@@ -89,8 +91,11 @@ jobs:
             ~/.cargo/registry/cache
             ~/.cargo/git/db
             target
-          key: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}-${{ matrix.build.TARGET }}
-          restore-keys: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}
+          key: ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-build-${{ matrix.build.TARGET }}
+          restore-keys: |
+            ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-build-
+            ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-
+            ${{ runner.os }}-
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -110,3 +115,28 @@ jobs:
         with:
           command: build
           args: --release --locked --target ${{ matrix.build.TARGET }} # --no-default-features
+
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/bin
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-ci
+          restore-keys: |
+            ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-
+            ${{ runner.os }}-
+      - run: cargo install --force cargo-make
+      - run: cargo make lint
+      - run: cargo make test
