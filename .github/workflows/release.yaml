@@ -92,7 +92,7 @@ jobs:
             ~/.cargo/registry/cache
             ~/.cargo/git/db
             target
-          key: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}-${{ env.TARGET }}
+          key: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}-${{ matrix.build.TARGET }}
           restore-keys: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
