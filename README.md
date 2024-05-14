@@ -1,5 +1,5 @@
 # TS Gettext Extractor
-![NPM Version](https://img.shields.io/npm/v/ts-gettext-extractor?style=for-the-badge&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fts-gettext-extractor)
+![NPM Version](https://img.shields.io/npm/v/ts-gettext-extractor?style=for-the-badge)
 ![Crates.io Version](https://img.shields.io/crates/v/ts-gettext-extractor?style=for-the-badge)
 
 A command line utility to generate Gettext template files (`.pot`) from Javascript/Typescript code.
