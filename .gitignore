@@ -11,3 +11,6 @@ node_modules/
 !.yarn/releases
 !.yarn/plugins
 .pnp.*
+
+# Copied during release
+/packages/ts-gettext-extractor/README.md

@@ -173,6 +173,8 @@ jobs:
         with:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
+      - run: |
+          cp README.md packages/ts-gettext-extractor/
       - name: Publish to NPM
         run: |
           cd packages/ts-gettext-extractor

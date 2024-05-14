@@ -1,4 +1,6 @@
 # TS Gettext Extractor
+![NPM Version](https://img.shields.io/npm/v/ts-gettext-extractor?style=for-the-badge&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fts-gettext-extractor)
+
 A command line utility to generate Gettext template files (`.pot`) from Javascript/Typescript code.
 
 Uses SWC to parse JS files.
@@ -58,8 +60,3 @@ This WILL NOT be extracted:
 const myText = __('My text');
 ```
 
-## Development
-This library is written in rust, so you'll need rust & cargo installed.
-
-## Release
-Release is done through the [cd workflow](/.github/workflows/cd.yaml). To create a new release just bump the version `yarn bump patch|minor|major` and `git push --follow-tags`.
