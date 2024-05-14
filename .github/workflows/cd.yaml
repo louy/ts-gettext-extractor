@@ -152,9 +152,9 @@ jobs:
         run: |
           cd packages/ts-gettext-extractor-${{ env.NAME }}/
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
-            yarn npm publish --tag rc
+            yarn npm publish --tolerate-republish --tag rc
           else
-            yarn npm publish
+            yarn npm publish --tolerate-republish
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
