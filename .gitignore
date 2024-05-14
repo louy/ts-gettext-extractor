@@ -6,3 +6,8 @@ node_modules/
 *.log*
 
 /packages/*/bin
+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+.pnp.*
