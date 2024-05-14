@@ -3,7 +3,7 @@ name = "ts-gettext-extractor"
 version = "0.0.1"
 edition = "2021"
 
-include = ["*.rs", "README.md"]
+include = ["*.rs", "README.md", "tests/expected-output", "tests/src"]
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
