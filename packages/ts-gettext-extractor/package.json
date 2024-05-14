@@ -2,7 +2,7 @@
   "name": "ts-gettext-extractor",
   "main": "index.js",
   "version": "0.0.2",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bin": "./index.js",
   "optionalDependencies": {
     "ts-gettext-extractor-darwin-arm64": "*",

@@ -4,7 +4,7 @@
   "main": "index.js",
   "repository": "https://github.com/louy/ts-gettext-extractor.git",
   "author": "Louay <louy@users.noreply.github.com>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "private": true,
   "workspaces": [
     "packages/*"

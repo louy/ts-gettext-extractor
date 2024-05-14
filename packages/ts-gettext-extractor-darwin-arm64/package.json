@@ -1,6 +1,7 @@
 {
   "name": "ts-gettext-extractor-darwin-arm64",
   "version": "0.0.2",
+  "license": "Apache-2.0",
   "os": [
     "darwin"
   ],

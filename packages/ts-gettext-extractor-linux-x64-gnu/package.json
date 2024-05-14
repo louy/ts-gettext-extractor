@@ -1,6 +1,7 @@
 {
   "name": "ts-gettext-extractor-linux-x64-gnu",
   "version": "0.0.2",
+  "license": "Apache-2.0",
   "os": [
     "linux"
   ],
