@@ -77,7 +77,7 @@ jobs:
           fi
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: build
+          shared-key: build-${{ matrix.build.TARGET }}
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
