@@ -1,2 +1,5 @@
 /target
 *.profraw
+
+# zigbuild artifact
+/.intentionally-empty-file.o
