@@ -71,6 +71,6 @@ __metadata:
     ts-gettext-extractor-linux-x64-musl:
       optional: true
   bin:
-    ts-gettext-extractor: ./index.js
+    ts-gettext-extractor: ./index.mjs
   languageName: unknown
   linkType: soft
