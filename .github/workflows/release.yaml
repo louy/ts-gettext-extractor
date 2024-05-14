@@ -1,0 +1,142 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish-binaries:
+    name: Publish binaries
+    runs-on: ${{ matrix.build.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          # - {
+          #     NAME: linux-x64-glibc,
+          #     OS: ubuntu-22.04,
+          #     TOOLCHAIN: stable,
+          #     TARGET: x86_64-unknown-linux-gnu,
+          #   }
+          # - {
+          #     NAME: linux-arm64-glibc,
+          #     OS: ubuntu-22.04,
+          #     TOOLCHAIN: stable,
+          #     TARGET: aarch64-unknown-linux-gnu,
+          #   }
+          # - {
+          #     NAME: win32-x64-msvc,
+          #     OS: windows-2022,
+          #     TOOLCHAIN: stable,
+          #     TARGET: x86_64-pc-windows-msvc,
+          #   }
+          # - {
+          #     NAME: win32-arm64-msvc,
+          #     OS: windows-2022,
+          #     TOOLCHAIN: stable,
+          #     TARGET: aarch64-pc-windows-msvc,
+          #   }
+          - {
+              NAME: darwin-x64,
+              OS: macos-12,
+              TOOLCHAIN: stable,
+              TARGET: x86_64-apple-darwin,
+            }
+          - {
+              NAME: darwin-arm64,
+              OS: macos-12,
+              TOOLCHAIN: stable,
+              TARGET: aarch64-apple-darwin,
+            }
+    env:
+      NAME: ${{ matrix.build.NAME }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set the release version
+        shell: bash
+        run: echo "RELEASE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
+      - name: Install dependencies
+        shell: bash
+        run: |
+          if [[ "${{ matrix.build.NAME }}" = *"-musl" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends \
+              --allow-unauthenticated musl-tools
+          fi
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.build.TOOLCHAIN }}
+          target: ${{ matrix.build.TARGET }}
+          override: true
+      - name: Build (linux/macos)
+        if: matrix.build.OS != 'windows-2022'
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --locked --target ${{ matrix.build.TARGET }}
+      - name: Build (windows)
+        if: matrix.build.OS == 'windows-2022'
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --locked --target ${{ matrix.build.TARGET }} # --no-default-features
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          mkdir -p packages/ts-gettext-extractor-${{ env.NAME }}/bin/
+          bin=ts-gettext-extractor
+          if [ "${{ matrix.build.OS }}" = "windows-2022" ]; then
+            bin="${bin}.exe"
+          fi
+          cp "target/${{ matrix.build.TARGET }}/release/${bin}" packages/ts-gettext-extractor-${{ env.NAME }}/bin/
+      - name: Create release artifacts
+        shell: bash
+        run: |
+          if [ "${{ matrix.build.OS }}" = "windows-2022" ]; then
+            7z a -tzip "ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.zip" \
+              ts-gettext-extractor-${{ env.NAME }}/
+          else
+            tar -czvf ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz \
+              ts-gettext-extractor-${{ env.NAME }}/
+            shasum -a 512 ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz \
+              > ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz.sha512
+          fi
+      - name: Publish to GitHub
+        if: ${{ !contains(github.ref, '-') }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}*
+          file_glob: true
+          overwrite: true
+          tag: ${{ github.ref }}
+          release_name: "Release v${{ env.RELEASE_VERSION }}"
+      - name: Publish to GitHub (pre-release)
+        if: ${{ contains(github.ref, '-') }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}*
+          file_glob: true
+          overwrite: true
+          tag: ${{ github.ref }}
+          release_name: "Pre-release v${{ env.RELEASE_VERSION }}"
+          prerelease: true
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+      - name: Publish to NPM
+        run: |
+          if [ ${{ contains(github.ref, '-') }} = "true" ]; then
+            yarn npm publish --tag rc
+          else
+            yarn npm publish
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
