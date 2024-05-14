@@ -134,9 +134,9 @@ jobs:
       - name: Publish to NPM
         run: |
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
-            yarn npm publish --tag rc
+            yarn workspaces foreach --no-private -A npm publish --tag rc
           else
-            yarn npm publish
+            yarn workspaces foreach --no-private -A npm publish
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
