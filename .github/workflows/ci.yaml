@@ -3,10 +3,16 @@ on:
   push:
     branches:
       - main
-env:
-  CARGO_TERM_COLOR: always
 
 name: CI
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: short
+  RUSTFLAGS: "-D warnings -W unreachable-pub -W rust-2021-compatibility"
+  RUSTUP_MAX_RETRIES: 10
 
 jobs:
   build:
@@ -78,24 +84,9 @@ jobs:
             sudo apt-get install -y --no-install-recommends \
               --allow-unauthenticated musl-tools
           fi
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-dependencies
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/.crates.toml
-            ~/.cargo/.crates2.json
-            ~/.cargo/bin
-            ~/.cargo/registry/index
-            ~/.cargo/registry/cache
-            ~/.cargo/git/db
-            target
-          key: ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-build-${{ matrix.build.TARGET }}
-          restore-keys: |
-            ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-build-
-            ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-
-            ${{ runner.os }}-
+          key: ${{ matrix.build.TARGET }}
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -120,23 +111,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-dependencies
-        with:
-          path: |
-            ~/.cargo/.crates.toml
-            ~/.cargo/.crates2.json
-            ~/.cargo/bin
-            ~/.cargo/registry/index
-            ~/.cargo/registry/cache
-            ~/.cargo/git/db
-            target
-          key: ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-ci
-          restore-keys: |
-            ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-
-            ${{ runner.os }}-
+      - uses: Swatinem/rust-cache@v2
       - run: cargo install --force cargo-make
       - run: cargo make lint
       - run: cargo make test
