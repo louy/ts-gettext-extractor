@@ -26,49 +26,41 @@ jobs:
           - {
               NAME: linux-x64-gnu,
               OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
               TARGET: x86_64-unknown-linux-gnu,
             }
           - {
               NAME: linux-arm64-gnu,
               OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
               TARGET: aarch64-unknown-linux-gnu,
             }
           - {
               NAME: linux-x64-musl,
               OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
               TARGET: x86_64-unknown-linux-musl,
             }
           - {
               NAME: linux-arm64-musl,
               OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
               TARGET: aarch64-unknown-linux-musl,
             }
           # - {
           #     NAME: win32-x64-msvc,
           #     OS: windows-2022,
-          #     TOOLCHAIN: stable,
           #     TARGET: x86_64-pc-windows-msvc,
           #   }
           # - {
           #     NAME: win32-arm64-msvc,
           #     OS: windows-2022,
-          #     TOOLCHAIN: stable,
           #     TARGET: aarch64-pc-windows-msvc,
           #   }
           - {
               NAME: darwin-x64,
               OS: macos-12,
-              TOOLCHAIN: stable,
               TARGET: x86_64-apple-darwin,
             }
           - {
               NAME: darwin-arm64,
               OS: macos-12,
-              TOOLCHAIN: stable,
               TARGET: aarch64-apple-darwin,
             }
     env:
@@ -93,7 +85,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ matrix.build.TOOLCHAIN }}
+          toolchain: stable
           target: ${{ matrix.build.TARGET }}
           override: true
       - name: Build (linux/macos)
