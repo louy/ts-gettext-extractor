@@ -157,7 +157,7 @@ jobs:
             yarn npm publish --tolerate-republish
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-main-package:
     needs: publish-binary
@@ -182,4 +182,4 @@ jobs:
             yarn npm publish
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
