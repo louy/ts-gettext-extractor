@@ -27,6 +27,6 @@ jobs:
             ~/.cargo/registry/cache
             ~/.cargo/git/db
             target
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.lock') }}
+          key: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}
       - run: cargo install --force cargo-make
       - run: cargo make lint

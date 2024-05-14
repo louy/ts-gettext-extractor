@@ -76,6 +76,21 @@ jobs:
             sudo apt-get install -y --no-install-recommends \
               --allow-unauthenticated musl-tools
           fi
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/bin
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}-${{ env.TARGET }}
+          restore-keys: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
