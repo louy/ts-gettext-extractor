@@ -9,5 +9,9 @@
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "yarn@4.2.2"
+  "packageManager": "yarn@4.2.2",
+  "scripts": {
+    "version": "yarn workspaces foreach --all version $npm_package_version && git add packages/*/package.json",
+    "bump": "npm version --force -m 'v%s' --git-tag-version=true"
+  }
 }
