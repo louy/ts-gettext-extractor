@@ -128,6 +128,7 @@ jobs:
           tag: ${{ github.ref }}
           release_name: "Pre-release v${{ env.RELEASE_VERSION }}"
           prerelease: true
+      - run: corepack enable
       - name: Install node
         uses: actions/setup-node@v4
         with:
@@ -152,6 +153,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - run: corepack enable
       - name: Install node
         uses: actions/setup-node@v4
         with:
