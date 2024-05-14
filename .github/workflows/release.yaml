@@ -13,18 +13,18 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          # - {
-          #     NAME: linux-x64-glibc,
-          #     OS: ubuntu-22.04,
-          #     TOOLCHAIN: stable,
-          #     TARGET: x86_64-unknown-linux-gnu,
-          #   }
-          # - {
-          #     NAME: linux-arm64-glibc,
-          #     OS: ubuntu-22.04,
-          #     TOOLCHAIN: stable,
-          #     TARGET: aarch64-unknown-linux-gnu,
-          #   }
+          - {
+              NAME: linux-x64-glibc,
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: x86_64-unknown-linux-gnu,
+            }
+          - {
+              NAME: linux-arm64-glibc,
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: aarch64-unknown-linux-gnu,
+            }
           # - {
           #     NAME: win32-x64-msvc,
           #     OS: windows-2022,
@@ -98,10 +98,10 @@ jobs:
         run: |
           if [ "${{ matrix.build.OS }}" = "windows-2022" ]; then
             7z a -tzip "ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.zip" \
-              ts-gettext-extractor-${{ env.NAME }}/
+            packages/ts-gettext-extractor-${{ env.NAME }}/
           else
             tar -czvf ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz \
-              ts-gettext-extractor-${{ env.NAME }}/
+              packages/ts-gettext-extractor-${{ env.NAME }}/
             shasum -a 512 ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz \
               > ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz.sha512
           fi
