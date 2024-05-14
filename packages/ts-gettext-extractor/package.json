@@ -6,11 +6,11 @@
   "bin": "./index.mjs",
   "type": "module",
   "optionalDependencies": {
-    "ts-gettext-extractor-darwin-arm64": "*",
-    "ts-gettext-extractor-darwin-x64": "*",
-    "ts-gettext-extractor-linux-arm64-gnu": "*",
-    "ts-gettext-extractor-linux-arm64-musl": "*",
-    "ts-gettext-extractor-linux-x64-gnu": "*",
-    "ts-gettext-extractor-linux-x64-musl": "*"
+    "ts-gettext-extractor-darwin-arm64": "0.0.5",
+    "ts-gettext-extractor-darwin-x64": "0.0.5",
+    "ts-gettext-extractor-linux-arm64-gnu": "0.0.5",
+    "ts-gettext-extractor-linux-arm64-musl": "0.0.5",
+    "ts-gettext-extractor-linux-x64-gnu": "0.0.5",
+    "ts-gettext-extractor-linux-x64-musl": "0.0.5"
   }
 }
