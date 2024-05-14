@@ -45,6 +45,7 @@ impl Visit for GettextVisitor<'_> {
     noop_visit_type!();
 
     fn visit_call_expr(&mut self, call: &CallExpr) {
+        call.visit_children_with(self);
         if let CallExpr {
             callee: Callee::Expr(expr),
             args,
@@ -216,8 +217,28 @@ impl Visit for GettextVisitor<'_> {
                 }
             }
         }
+    }
 
-        call.visit_children_with(self);
+    fn visit_tagged_tpl(&mut self, n: &TaggedTpl) {
+        n.visit_children_with(self);
+
+        let TaggedTpl { span, tag, tpl, .. } = n;
+
+        if let Expr::Ident(Ident { sym, .. }) = tag.deref() {
+            let Tpl { quasis, .. } = tpl.deref();
+            if *sym == "__" {
+                if let [TplElement {
+                    cooked: Some(value),
+                    ..
+                }] = &quasis[..1]
+                {
+                    let pot = &mut self.pot.lock().unwrap();
+                    let meta =
+                        pot.add_message(None, POTMessageID::Singular(None, value.to_string()));
+                    self.add_message_meta(span, meta)
+                }
+            }
+        }
     }
 }
 
@@ -391,6 +412,24 @@ msgid "1 object"
 msgid_plural "%d objects"
 msgstr[0] ""
 msgstr[1] ""
+"#
+        );
+    }
+
+    #[test]
+    fn detects_tagged_template_literal() {
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse("tpl.js", r#"__("Hello, world!");"#, Arc::clone(&pot));
+        assert_eq!(
+            pot.lock().unwrap().to_string(None).unwrap(),
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tpl.js:1
+msgid "Hello, world!"
+msgstr ""
 "#
         );
     }

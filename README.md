@@ -40,6 +40,8 @@ Options:
 - **`dpgettext`** or **`__dp`** — e.g. `__dp('domain', 'context', 'String')`
 - **`dnpgettext`** or **`__dnp`** — e.g. `__dnp('domain', 'context', '1 item', '%n items', count)`
 
+One tagged template literal is supported, which is `__` with no variables. E.g. `` __`My string` ``
+
 ## Metadata
 
 This library produces a few metadata in the POT files as below.
