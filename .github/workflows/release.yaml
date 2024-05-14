@@ -8,6 +8,8 @@ on:
 jobs:
   publish-binary:
     name: Publish binary
+    permissions: 
+      contents: write
     runs-on: ${{ matrix.build.os }}
     strategy:
       fail-fast: false
@@ -144,6 +146,8 @@ jobs:
 
   publish-main-package:
     needs: publish-binary
+    permissions: 
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
