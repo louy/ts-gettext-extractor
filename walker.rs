@@ -82,7 +82,7 @@ pub fn parse_file(path: &Path, pot: Arc<Mutex<crate::pot::POT>>, references_rela
     let lexer = Lexer::new(
         syntax,
         // EsVersion defaults to es5
-        Default::default(),
+        swc_ecma_ast::EsVersion::EsNext,
         StringInput::from(&*fm),
         Some(&comments),
     );
