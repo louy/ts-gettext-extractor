@@ -1,2 +1,8 @@
 /target
 *.profraw
+
+node_modules/
+
+*.log*
+
+/packages/*/bin

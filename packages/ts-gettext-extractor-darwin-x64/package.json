@@ -1,0 +1,10 @@
+{
+  "name": "ts-gettext-extractor-darwin-x64",
+  "version": "0.0.1",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ]
+}

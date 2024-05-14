@@ -1,0 +1,13 @@
+{
+  "name": "ts-gettext-extractor",
+  "main": "index.js",
+  "version": "0.0.1",
+  "license": "MIT",
+  "bin": {
+    "ts-gettext-extractor": "./index.js"
+  },
+  "optionalDependencies": {
+    "ts-gettext-extractor-darwin-x64": "*",
+    "ts-gettext-extractor-darwin-arm64": "*"
+  }
+}

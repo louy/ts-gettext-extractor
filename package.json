@@ -1,0 +1,12 @@
+{
+  "name": "@louy/ts-gettext-extractor",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "https://github.com/louy/ts-gettext-extractor.git",
+  "author": "Louay <louy@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
