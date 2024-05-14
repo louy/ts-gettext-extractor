@@ -8,6 +8,8 @@
     "ts-gettext-extractor-darwin-arm64": "*",
     "ts-gettext-extractor-darwin-x64": "*",
     "ts-gettext-extractor-linux-arm64-gnu": "*",
-    "ts-gettext-extractor-linux-x64-gnu": "*"
+    "ts-gettext-extractor-linux-arm64-musl": "*",
+    "ts-gettext-extractor-linux-x64-gnu": "*",
+    "ts-gettext-extractor-linux-x64-musl": "*"
   }
 }

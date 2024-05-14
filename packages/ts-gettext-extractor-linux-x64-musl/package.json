@@ -1,0 +1,13 @@
+{
+  "name": "ts-gettext-extractor-linux-x64-musl",
+  "version": "0.0.2",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "libc": [
+    "musl"
+  ]
+}

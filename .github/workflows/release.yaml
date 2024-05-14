@@ -27,6 +27,18 @@ jobs:
               TOOLCHAIN: stable,
               TARGET: aarch64-unknown-linux-gnu,
             }
+          - {
+              NAME: linux-x64-musl,
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: x86_64-unknown-linux-musl,
+            }
+          - {
+              NAME: linux-arm64-musl,
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: aarch64-unknown-linux-musl,
+            }
           # - {
           #     NAME: win32-x64-msvc,
           #     OS: windows-2022,
