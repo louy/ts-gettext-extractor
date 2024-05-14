@@ -8,20 +8,27 @@ import { spawnSync } from "child_process";
  * If the platform is `win32` or `cygwin`, executable will include a `.exe` extension.
  * @see https://nodejs.org/api/os.html#osarch
  * @see https://nodejs.org/api/os.html#osplatform
- * @example "x/xx/node_modules/app-darwin-arm64"
+ * @example "x/xx/node_modules/ts-gettext-extractor-darwin-arm64"
  */
 function getExePath() {
   const arch = process.arch;
   let os = process.platform;
   let extension = "";
-  if (["win32", "cygwin"].includes(process.platform)) {
-    os = "windows";
-    extension = ".exe";
+  let packageSuffix = ''
+
+  switch (true) {
+    case ["win32", "cygwin"].includes(process.platform):
+      os = "windows";
+      extension = ".exe";
+      break;
+    case os === 'linux':
+      packageSuffix = '-gnu';
+      break;
   }
 
   try {
     // Since the binary will be located inside `node_modules`, we can simply call `require.resolve`
-    return require.resolve(`ts-gettext-extractor-${os}-${arch}/bin/ts-gettext-extractor${extension}`);
+    return require.resolve(`ts-gettext-extractor-${os}-${arch}${packageSuffix}/bin/ts-gettext-extractor${extension}`);
   } catch (e) {
     throw new Error(
       `Couldn't find binary inside node_modules for ${os}-${arch}`

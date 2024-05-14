@@ -14,13 +14,13 @@ jobs:
       matrix:
         build:
           - {
-              NAME: linux-x64-glibc,
+              NAME: linux-x64-gnu,
               OS: ubuntu-22.04,
               TOOLCHAIN: stable,
               TARGET: x86_64-unknown-linux-gnu,
             }
           - {
-              NAME: linux-arm64-glibc,
+              NAME: linux-arm64-gnu,
               OS: ubuntu-22.04,
               TOOLCHAIN: stable,
               TARGET: aarch64-unknown-linux-gnu,
