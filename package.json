@@ -11,7 +11,9 @@
   ],
   "packageManager": "yarn@4.2.2",
   "scripts": {
-    "version": "yarn workspaces foreach --all version $npm_package_version && git add packages/*/package.json",
-    "bump": "npm version --force -m 'v%s' --git-tag-version=true"
+    "version": "yarn workspaces foreach --all version $npm_package_version && git add packages/*/package.json && yarn bump:cargo",
+    "prebump": "cargo check",
+    "bump": "npm version --force -m 'v%s' --git-tag-version=true",
+    "bump:cargo": "perl -i -pe 's/^version = \"[^\"]+\"/version = \"'$npm_package_version'\"/' Cargo.toml && cargo check && git add Cargo.*"
   }
 }
