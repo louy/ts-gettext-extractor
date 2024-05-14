@@ -59,12 +59,7 @@ const myText = __('My text');
 ```
 
 ## Development
-This library is written in rust, so you'll need rust & cargo installed. We also use `cargo-make` so make sure to install it:
-```console
-$ cargo install --force cargo-make
-```
-
-Look at [Makefile.toml](/Makefile.toml) for list of tools & tasks we use.
+This library is written in rust, so you'll need rust & cargo installed.
 
 ## Release
-Release is done through the [cd workflow](/.github/workflows/cd.yaml). To make a new release just bump the version `yarn bump patch|minor|major` and `git push --follow-tags`.
+Release is done through the [cd workflow](/.github/workflows/cd.yaml). To create a new release just bump the version `yarn bump patch|minor|major` and `git push --follow-tags`.
