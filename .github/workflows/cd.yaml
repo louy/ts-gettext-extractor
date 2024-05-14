@@ -80,7 +80,7 @@ jobs:
           fi
       - uses: Swatinem/rust-cache@v2
         with:
-          key: ${{ matrix.build.TARGET }}
+          shared-key: build
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
