@@ -109,6 +109,7 @@ jobs:
             bin="${bin}.exe"
           fi
           cp "target/${{ matrix.build.TARGET }}/release/${bin}" packages/ts-gettext-extractor-${{ env.NAME }}/bin/
+          chmod +x packages/ts-gettext-extractor-${{ env.NAME }}/bin/${bin}
       - name: Create release artifacts
         shell: bash
         run: |
