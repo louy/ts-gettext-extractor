@@ -17,6 +17,5 @@
     "version:cargo": "perl -i -pe 's/^version = \"[^\"]+\"/version = \"'$npm_package_version'\"/' Cargo.toml && cargo check && git add Cargo.*",
     "version:yarn-lock": "yarn && git add yarn.lock",
     "bump": "npm version --force -m 'v%s' --git-tag-version=true"
-  },
-  "stableVersion": "0.0.6-0"
+  }
 }

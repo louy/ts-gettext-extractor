@@ -8,5 +8,8 @@
   "cpu": [
     "x64"
   ],
-  "stableVersion": "0.0.6"
+  "stableVersion": "0.0.6",
+  "repository": {
+    "url": "https://github.com/louy/ts-gettext-extractor"
+  }
 }

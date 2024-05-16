@@ -13,5 +13,8 @@
     "ts-gettext-extractor-linux-x64-gnu": "0.0.6-6",
     "ts-gettext-extractor-linux-x64-musl": "0.0.6-6"
   },
-  "stableVersion": "0.0.6"
+  "stableVersion": "0.0.6",
+  "repository": {
+    "url": "https://github.com/louy/ts-gettext-extractor"
+  }
 }
