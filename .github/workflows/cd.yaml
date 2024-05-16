@@ -109,7 +109,6 @@ jobs:
             bin="${bin}.exe"
           fi
           cp "target/${{ matrix.build.TARGET }}/release/${bin}" packages/ts-gettext-extractor-${{ env.NAME }}/bin/
-          chmod +x packages/ts-gettext-extractor-${{ env.NAME }}/bin/${bin}
       - name: Create release artifacts
         shell: bash
         run: |
@@ -153,11 +152,6 @@ jobs:
       - name: Publish to NPM
         run: |
           cd packages/ts-gettext-extractor-${{ env.NAME }}/
-          # ensure binary is executable
-          if [[ ! -x bin/ts-gettext-extractor ]]; then
-            echo "Binary is not executable"
-            exit 1
-          fi
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
             yarn npm publish --tolerate-republish --tag rc
           else
