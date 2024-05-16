@@ -113,14 +113,15 @@ jobs:
       - name: Create release artifacts
         shell: bash
         run: |
+          cd packages
           if [ "${{ matrix.build.OS }}" = "windows-2022" ]; then
-            7z a -tzip "ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.zip" \
-            packages/ts-gettext-extractor-${{ env.NAME }}/
+            7z a -tzip "../ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.zip" \
+            ts-gettext-extractor-${{ env.NAME }}/
           else
-            tar -czvf ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz \
-              packages/ts-gettext-extractor-${{ env.NAME }}/
-            shasum -a 512 ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz \
-              > ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz.sha512
+            tar -czvf ../ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz \
+              ts-gettext-extractor-${{ env.NAME }}/
+            shasum -a 512 ../ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz \
+              > ../ts-gettext-extractor-${{ env.NAME }}-${{ env.RELEASE_VERSION }}.tar.gz.sha512
           fi
       - name: Publish to GitHub
         if: ${{ !contains(github.ref, '-') }}
@@ -152,6 +153,11 @@ jobs:
       - name: Publish to NPM
         run: |
           cd packages/ts-gettext-extractor-${{ env.NAME }}/
+          # ensure binary is executable
+          if [[ stat -c %a bin/ts-gettext-extractor != "744" ]]; then
+            echo "Missing permission: $(stat -c %a bin/ts-gettext-extractor)"
+            exit 1
+          fi
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
             yarn npm publish --tolerate-republish --tag rc
           else
