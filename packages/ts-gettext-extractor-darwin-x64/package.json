@@ -1,6 +1,6 @@
 {
   "name": "ts-gettext-extractor-darwin-x64",
-  "version": "0.0.6-7",
+  "version": "0.0.7",
   "license": "Apache-2.0",
   "os": [
     "darwin"
@@ -8,7 +8,6 @@
   "cpu": [
     "x64"
   ],
-  "stableVersion": "0.0.6",
   "repository": {
     "url": "https://github.com/louy/ts-gettext-extractor"
   }
