@@ -159,7 +159,7 @@ jobs:
             npm publish --provenance
           fi
         env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-main-package:
     needs: publish-binary
@@ -187,7 +187,7 @@ jobs:
             npm publish --provenance
           fi
         env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   
   publish-crate:
     runs-on: ubuntu-latest
