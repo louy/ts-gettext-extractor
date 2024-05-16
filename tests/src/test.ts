@@ -6,3 +6,10 @@ Another comment to be extracted. However, this time it's a very long comment tha
 
 __(`Test backticks`);
 __d('test', `Test backticks with __d`);
+
+__("'Single quote'");
+__(
+  '"Double quotes at exactly 76th character of this string... do you like that"'
+);
+__`And a
+new line!`;

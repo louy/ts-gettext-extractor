@@ -8,6 +8,21 @@ msgctxt "title"
 msgid "App"
 msgstr ""
 
+#: src/test.ts:11
+msgid ""
+"\"Double quotes at exactly 76th character of this string... do you like "
+"that\""
+msgstr ""
+
+#: src/test.ts:10
+msgid "'Single quote'"
+msgstr ""
+
+#: src/test.ts:14
+msgid "And a
+new line!"
+msgstr ""
+
 #: src/index.jsx:12
 msgid ""
 "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium "
