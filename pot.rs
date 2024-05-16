@@ -71,7 +71,7 @@ impl Ord for POTMessageID {
             return msgid1.cmp(msgid2);
         }
 
-        return std::cmp::Ordering::Equal;
+        std::cmp::Ordering::Equal
     }
 }
 impl POTMessageID {
