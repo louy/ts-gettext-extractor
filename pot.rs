@@ -230,23 +230,23 @@ const MAX_LINE_LENGTH: usize = 80;
 
 fn format_po_message(key: &str, msg: &str) -> std::string::String {
     // If line will exceed max length (including quotes & space)
+    let msg_escaped = msg.replace('"', "\\\"");
     if msg.len() > MAX_LINE_LENGTH - key.len() - 3 {
         let mut result = String::new();
         result.push_str(&format!("{} \"\"\n", key));
         let mut line = String::new();
-        for word in msg.split_whitespace() {
+        for word in msg_escaped.split_whitespace() {
             // minus 3 for the quotes and trailing space
-            let word_escaped = word.replace('"', "\\\"");
-            if (line.len() + word_escaped.len() + 1) > (MAX_LINE_LENGTH - 3) {
+            if (line.len() + word.len() + 1) > (MAX_LINE_LENGTH - 3) {
                 result.push_str(&format!("\"{}\"\n", line));
                 line = String::new();
             }
-            line.push_str(&format!("{} ", word_escaped));
+            line.push_str(&format!("{} ", word));
         }
         result.push_str(&format!("\"{}\"", line.trim()));
         result
     } else {
-        format!("{} \"{}\"", key, msg)
+        format!("{} \"{}\"", key, msg_escaped)
     }
 }
 
