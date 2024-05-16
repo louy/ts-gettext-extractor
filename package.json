@@ -1,6 +1,6 @@
 {
   "name": "@louy/ts-gettext-extractor",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "index.js",
   "repository": "https://github.com/louy/ts-gettext-extractor.git",
   "author": "Louay <louy@users.noreply.github.com>",

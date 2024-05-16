@@ -1,6 +1,6 @@
 [package]
 name = "ts-gettext-extractor"
-version = "0.0.7"
+version = "0.0.8"
 edition = "2021"
 
 description = "Extracts gettext strings from Javascript/TypeScript files"
