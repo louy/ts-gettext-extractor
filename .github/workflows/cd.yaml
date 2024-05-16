@@ -154,8 +154,8 @@ jobs:
         run: |
           cd packages/ts-gettext-extractor-${{ env.NAME }}/
           # ensure binary is executable
-          if [[ stat -c %a bin/ts-gettext-extractor != "744" ]]; then
-            echo "Missing permission: $(stat -c %a bin/ts-gettext-extractor)"
+          if [[ ! -x bin/ts-gettext-extractor ]]; then
+            echo "Binary is not executable"
             exit 1
           fi
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
