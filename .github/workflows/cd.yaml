@@ -182,9 +182,9 @@ jobs:
         run: |
           cd packages/ts-gettext-extractor
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
-            yarn npm publish --tolerate-republish --tag rc
+            npm publish --provenance --tag rc
           else
-            yarn npm publish --tolerate-republish
+            npm publish --provenance
           fi
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
