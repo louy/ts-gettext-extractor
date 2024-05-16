@@ -154,9 +154,9 @@ jobs:
         run: |
           cd packages/ts-gettext-extractor-${{ env.NAME }}/
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
-            npm publish --provenance --tag rc
+            npm publish --provenance --access public --tag rc
           else
-            npm publish --provenance
+            npm publish --provenance --access public
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -182,9 +182,9 @@ jobs:
         run: |
           cd packages/ts-gettext-extractor
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
-            npm publish --provenance --tag rc
+            npm publish --provenance --access public --tag rc
           else
-            npm publish --provenance
+            npm publish --provenance --access public
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
