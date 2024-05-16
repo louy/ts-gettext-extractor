@@ -12,7 +12,7 @@
   "packageManager": "yarn@4.2.2",
   "scripts": {
     "preversion": "cargo check",
-    "version": "echo $npm_package_version && yarn workspaces foreach -At version $npm_package_version && yarn version:optional-deps && yarn && git add packages/*/package.json && yarn version:yarn-lock && yarn version:cargo",
+    "version": "echo $npm_package_version && yarn workspaces foreach -Atv version $npm_package_version && yarn workspaces foreach -Atv version $npm_package_version && yarn version:optional-deps && yarn && git add packages/*/package.json && yarn version:yarn-lock && yarn version:cargo",
     "version:optional-deps": "cat packages/ts-gettext-extractor/package.json | jq '.optionalDependencies[]=\"'$npm_package_version'\"' > packages/ts-gettext-extractor/package.json && git add packages/ts-gettext-extractor/package.json",
     "version:cargo": "perl -i -pe 's/^version = \"[^\"]+\"/version = \"'$npm_package_version'\"/' Cargo.toml && cargo check && git add Cargo.*",
     "version:yarn-lock": "yarn && git add yarn.lock",
