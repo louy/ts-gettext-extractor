@@ -6,6 +6,7 @@ msgstr ""
 #. Another comment to be extracted. However, this time it's a very long comment
 #. that can span multiple lines and might be broken into multiple lines in the
 #. output `.po` file. 
+#: src/test.copy.ts:5
 #: src/test.ts:5
 msgid "Hello there!"
 msgstr ""

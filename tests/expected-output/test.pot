@@ -8,16 +8,19 @@ msgctxt "title"
 msgid "App"
 msgstr ""
 
+#: src/test.copy.ts:11
 #: src/test.ts:11
 msgid ""
 "\"Double quotes at exactly 76th character of this string... do you like "
 "that\""
 msgstr ""
 
+#: src/test.copy.ts:10
 #: src/test.ts:10
 msgid "'Single quote'"
 msgstr ""
 
+#: src/test.copy.ts:14
 #: src/test.ts:14
 msgid "And a new line!"
 msgstr ""
@@ -38,10 +41,12 @@ msgid ""
 "eum fugiat quo voluptas nulla pariatur? "
 msgstr ""
 
+#: src/test.copy.ts:7
 #: src/test.ts:7
 msgid "Test backticks"
 msgstr ""
 
+#: src/test.copy.ts:8
 #: src/test.ts:8
 msgid "Test backticks with __d"
 msgstr ""
