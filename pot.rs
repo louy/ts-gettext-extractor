@@ -230,12 +230,15 @@ const MAX_LINE_LENGTH: usize = 80;
 
 fn format_po_message(key: &str, msg: &str) -> std::string::String {
     // If line will exceed max length (including quotes & space)
-    let msg_escaped = msg.replace('"', "\\\"");
-    if msg.len() > MAX_LINE_LENGTH - key.len() - 3 {
+    let msg_escaped = msg
+        .replace('"', "\\\"")
+        .replace("\r\n", " ")
+        .replace(['\r', '\n'], " ");
+    if msg_escaped.len() > MAX_LINE_LENGTH - key.len() - 3 {
         let mut result = String::new();
         result.push_str(&format!("{} \"\"\n", key));
         let mut line = String::new();
-        for word in msg_escaped.split_whitespace() {
+        for word in msg_escaped.split(' ') {
             // minus 3 for the quotes and trailing space
             if (line.len() + word.len() + 1) > (MAX_LINE_LENGTH - 3) {
                 result.push_str(&format!("\"{}\"\n", line));
@@ -451,6 +454,46 @@ msgstr ""
 
 #: path/to/very/long/filename/that/shouldnt/be/broken/here/we/go/really/this/time/my_super_special_file_v3_FINAL_FINAL_NO_EDIT.tsx:246912631923213
 msgid "Hi friend"
+msgstr ""
+"#
+        );
+    }
+
+    #[test]
+    fn it_handles_special_whitespaces_correctly() {
+        let mut pot = POT::new(None);
+        pot.add_message(
+            None,
+            POTMessageID::Singular(
+                None,
+                r#"A string with a new line
+should be replaced with a space"#
+                    .to_string(),
+            ),
+        );
+        pot.add_message(
+            None,
+            POTMessageID::Singular(None, "A string double  whitespace".to_string()),
+        );
+        pot.add_message(
+            None,
+            POTMessageID::Singular(None, "Special\u{a0}space".to_string()),
+        );
+
+        assert_eq!(
+            pot.to_string(None).unwrap(),
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "A string double  whitespace"
+msgstr ""
+
+msgid "A string with a new line should be replaced with a space"
+msgstr ""
+
+msgid "Special space"
 msgstr ""
 "#
         );
