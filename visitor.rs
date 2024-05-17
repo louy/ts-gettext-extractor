@@ -23,21 +23,21 @@ pub struct GettextVisitor<'a> {
 impl GettextVisitor<'_> {
     fn add_message_meta(&self, span: &Span, meta: &mut POTMessageMeta) {
         if let Some(reference) = format_reference(&self.cm, span, self.references_relative_to) {
-            meta.references.push(reference)
+            meta.references.insert(reference);
         }
 
         let mut comments = Vec::<Comment>::new();
 
         if let Some(leading) = self.comments.get_leading(span.lo) {
-            comments.extend(leading)
+            comments.extend(leading);
         }
         if let Some(trailing) = self.comments.get_trailing(span.hi) {
-            comments.extend(trailing)
+            comments.extend(trailing);
         }
 
         for comment in comments {
             meta.extracted_comments
-                .push(String::from(comment.text.trim()));
+                .insert(String::from(comment.text.trim()));
         }
     }
 }

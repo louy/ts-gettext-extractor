@@ -1,6 +1,6 @@
 // See https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html for details about a POT file format
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// An individual message in a POT file
 #[derive(Debug, PartialEq, Eq, Hash)]
@@ -118,18 +118,18 @@ impl POTMessageID {
 /// Metadata about a message in a POT file that doesn't affect it's uniqueness
 #[derive(Debug)]
 pub struct POTMessageMeta {
-    pub references: Vec<String>,
-    pub translator_comments: Vec<String>,
-    pub extracted_comments: Vec<String>,
-    pub flags: Vec<String>,
+    pub references: BTreeSet<String>,
+    pub translator_comments: BTreeSet<String>,
+    pub extracted_comments: BTreeSet<String>,
+    pub flags: BTreeSet<String>,
 }
 impl POTMessageMeta {
     fn new() -> Self {
         Self {
-            references: Vec::new(),
-            translator_comments: Vec::new(),
-            extracted_comments: Vec::new(),
-            flags: Vec::new(),
+            references: BTreeSet::new(),
+            translator_comments: BTreeSet::new(),
+            extracted_comments: BTreeSet::new(),
+            flags: BTreeSet::new(),
         }
     }
 
@@ -291,7 +291,7 @@ mod tests {
         reference: String,
     ) {
         let meta = pot.add_message(domain, message);
-        meta.references.push(reference.to_string());
+        meta.references.insert(reference.to_string());
     }
 
     #[test]
@@ -415,7 +415,7 @@ msgstr ""
     fn it_doesnt_break_on_multiline_comment() {
         let mut pot = POT::new(None);
         let meta = pot.add_message(None, POTMessageID::Singular(None, "Hi friend".to_string()));
-        meta.extracted_comments.push(String::from(
+        meta.extracted_comments.insert(String::from(
             r#"
 This is a not so long comment.
 However, it has a line break in it.
@@ -441,7 +441,7 @@ msgstr ""
     fn it_doesnt_break_on_very_long_reference_filename() {
         let mut pot = POT::new(None);
         let meta = pot.add_message(None, POTMessageID::Singular(None, "Hi friend".to_string()));
-        meta.references.push(
+        meta.references.insert(
             "path/to/very/long/filename/that/shouldnt/be/broken/here/we/go/really/this/time/my_super_special_file_v3_FINAL_FINAL_NO_EDIT.tsx:246912631923213"
                 .to_string(),
         );
