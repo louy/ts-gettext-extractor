@@ -246,7 +246,9 @@ fn format_po_message(key: &str, msg: &str) -> std::string::String {
             }
             line.push_str(&format!("{} ", word));
         }
-        result.push_str(&format!("\"{}\"", line.trim()));
+        if !line.is_empty() {
+            result.push_str(&format!("\"{}\"", &line[..line.len() - 1]));
+        }
         result
     } else {
         format!("{} \"{}\"", key, msg_escaped)
