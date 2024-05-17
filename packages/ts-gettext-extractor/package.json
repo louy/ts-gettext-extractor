@@ -1,17 +1,17 @@
 {
   "name": "ts-gettext-extractor",
   "main": "index.js",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "license": "Apache-2.0",
   "bin": "./index.mjs",
   "type": "module",
   "optionalDependencies": {
-    "ts-gettext-extractor-darwin-arm64": "0.0.9",
-    "ts-gettext-extractor-darwin-x64": "0.0.9",
-    "ts-gettext-extractor-linux-arm64-gnu": "0.0.9",
-    "ts-gettext-extractor-linux-arm64-musl": "0.0.9",
-    "ts-gettext-extractor-linux-x64-gnu": "0.0.9",
-    "ts-gettext-extractor-linux-x64-musl": "0.0.9"
+    "ts-gettext-extractor-darwin-arm64": "0.0.10",
+    "ts-gettext-extractor-darwin-x64": "0.0.10",
+    "ts-gettext-extractor-linux-arm64-gnu": "0.0.10",
+    "ts-gettext-extractor-linux-arm64-musl": "0.0.10",
+    "ts-gettext-extractor-linux-x64-gnu": "0.0.10",
+    "ts-gettext-extractor-linux-x64-musl": "0.0.10"
   },
   "repository": {
     "url": "https://github.com/louy/ts-gettext-extractor"
