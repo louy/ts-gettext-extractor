@@ -61,7 +61,10 @@ impl Visit for GettextVisitor<'_> {
                                 let pot = &mut self.pot.lock().unwrap();
                                 let meta = pot.add_message(
                                     None,
-                                    POTMessageID::Singular(None, value1.to_string()),
+                                    POTMessageID {
+                                        msgid: value1.to_string(),
+                                        ..Default::default()
+                                    },
                                 );
                                 self.add_message_meta(span, meta)
                             }
@@ -78,11 +81,11 @@ impl Visit for GettextVisitor<'_> {
                                 let pot = &mut self.pot.lock().unwrap();
                                 let meta = pot.add_message(
                                     None,
-                                    POTMessageID::Plural(
-                                        None,
-                                        value1.to_string(),
-                                        value2.to_string(),
-                                    ),
+                                    POTMessageID {
+                                        msgid: value1.to_string(),
+                                        msgid_plural: Some(value2.to_string()),
+                                        ..Default::default()
+                                    },
                                 );
                                 self.add_message_meta(span, meta)
                             }
@@ -99,10 +102,11 @@ impl Visit for GettextVisitor<'_> {
                                 let pot = &mut self.pot.lock().unwrap();
                                 let meta = pot.add_message(
                                     None,
-                                    POTMessageID::Singular(
-                                        Some(value1.to_string()),
-                                        value2.to_string(),
-                                    ),
+                                    POTMessageID {
+                                        msgctx: Some(value1.to_string()),
+                                        msgid: value2.to_string(),
+                                        ..Default::default()
+                                    },
                                 );
                                 self.add_message_meta(span, meta)
                             }
@@ -120,11 +124,11 @@ impl Visit for GettextVisitor<'_> {
                                 let pot = &mut self.pot.lock().unwrap();
                                 let meta = pot.add_message(
                                     None,
-                                    POTMessageID::Plural(
-                                        Some(value1.to_string()),
-                                        value2.to_string(),
-                                        value3.to_string(),
-                                    ),
+                                    POTMessageID {
+                                        msgctx: Some(value1.to_string()),
+                                        msgid: value2.to_string(),
+                                        msgid_plural: Some(value3.to_string()),
+                                    },
                                 );
                                 self.add_message_meta(span, meta)
                             }
@@ -141,7 +145,10 @@ impl Visit for GettextVisitor<'_> {
                                 let pot = &mut self.pot.lock().unwrap();
                                 let meta = pot.add_message(
                                     Some(value1.to_string()),
-                                    POTMessageID::Singular(None, value2.to_string()),
+                                    POTMessageID {
+                                        msgid: value2.to_string(),
+                                        ..Default::default()
+                                    },
                                 );
                                 self.add_message_meta(span, meta)
                             }
@@ -159,11 +166,11 @@ impl Visit for GettextVisitor<'_> {
                                 let pot = &mut self.pot.lock().unwrap();
                                 let meta = pot.add_message(
                                     Some(value1.to_string()),
-                                    POTMessageID::Plural(
-                                        None,
-                                        value2.to_string(),
-                                        value3.to_string(),
-                                    ),
+                                    POTMessageID {
+                                        msgid: value2.to_string(),
+                                        msgid_plural: Some(value3.to_string()),
+                                        ..Default::default()
+                                    },
                                 );
                                 self.add_message_meta(span, meta)
                             }
@@ -181,10 +188,11 @@ impl Visit for GettextVisitor<'_> {
                                 let pot = &mut self.pot.lock().unwrap();
                                 let meta = pot.add_message(
                                     Some(value1.to_string()),
-                                    POTMessageID::Singular(
-                                        Some(value2.to_string()),
-                                        value3.to_string(),
-                                    ),
+                                    POTMessageID {
+                                        msgctx: Some(value2.to_string()),
+                                        msgid: value3.to_string(),
+                                        ..Default::default()
+                                    },
                                 );
                                 self.add_message_meta(span, meta)
                             }
@@ -203,11 +211,11 @@ impl Visit for GettextVisitor<'_> {
                                 let pot = &mut self.pot.lock().unwrap();
                                 let meta = pot.add_message(
                                     Some(value1.to_string()),
-                                    POTMessageID::Plural(
-                                        Some(value2.to_string()),
-                                        value3.to_string(),
-                                        value4.to_string(),
-                                    ),
+                                    POTMessageID {
+                                        msgctx: Some(value2.to_string()),
+                                        msgid: value3.to_string(),
+                                        msgid_plural: Some(value4.to_string()),
+                                    },
                                 );
                                 self.add_message_meta(span, meta)
                             }
@@ -233,8 +241,13 @@ impl Visit for GettextVisitor<'_> {
                 }] = &quasis[..1]
                 {
                     let pot = &mut self.pot.lock().unwrap();
-                    let meta =
-                        pot.add_message(None, POTMessageID::Singular(None, value.to_string()));
+                    let meta = pot.add_message(
+                        None,
+                        POTMessageID {
+                            msgid: value.to_string(),
+                            ..Default::default()
+                        },
+                    );
                     self.add_message_meta(span, meta)
                 }
             }

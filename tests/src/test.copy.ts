@@ -13,3 +13,7 @@ __(
 );
 __`And a
 new line!`;
+
+
+__dp("duplicates", "Fancy context", "Duplicate string");
+__dp("duplicates", "Fancy context", "Duplicate string");

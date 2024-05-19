@@ -1,0 +1,12 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/test.copy.ts:18
+#: src/test.copy.ts:19
+#: src/test.ts:18
+#: src/test.ts:19
+msgctxt "Fancy context"
+msgid "Duplicate string"
+msgstr ""

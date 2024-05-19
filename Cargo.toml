@@ -12,6 +12,7 @@ include = ["*.rs", "README.md", "tests/expected-output", "tests/src", "LICENSE"]
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
 indicatif = "0.17.8"
+itertools = "0.13.0"
 pathdiff = "0.2.1"
 swc_atoms = "0.6.7"
 swc_common = { version = "0.33.26", features = ["tty-emitter"] }
