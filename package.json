@@ -12,9 +12,10 @@
   "packageManager": "yarn@4.2.2",
   "scripts": {
     "preversion": "cargo check",
-    "version": "echo $npm_package_version && yarn workspaces foreach -Atv version $npm_package_version && yarn workspaces foreach -Atv version $npm_package_version && yarn version:optional-deps && yarn && git add packages/*/package.json && yarn version:yarn-lock && yarn version:cargo",
+    "version": "echo $npm_package_version && yarn workspaces foreach -Atv version $npm_package_version && yarn workspaces foreach -Atv version $npm_package_version && yarn version:optional-deps && yarn && git add packages/*/package.json && yarn version:yarn-lock && yarn version:cargo && yarn version:changelog",
     "version:optional-deps": "cat packages/ts-gettext-extractor/package.json | jq '.optionalDependencies[]=\"'$npm_package_version'\"' > packages/ts-gettext-extractor/package.json && git add packages/ts-gettext-extractor/package.json",
     "version:cargo": "perl -i -pe 's/^version = \"[^\"]+\"/version = \"'$npm_package_version'\"/' Cargo.toml && cargo check && git add Cargo.*",
+    "version:changelog": "yarn run conventional-changelog -i CHANGELOG.md -s -t v -p conventionalcommits && git add CHANGELOG.md",
     "version:yarn-lock": "yarn && git add yarn.lock",
     "bump": "npm version --force -m 'v%s' --git-tag-version=true",
     "prepare": "husky install"
@@ -22,6 +23,8 @@
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
+    "conventional-changelog-cli": "^5.0.0",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
     "husky": "^8.0.0"
   }
 }
