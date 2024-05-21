@@ -16,6 +16,12 @@
     "version:optional-deps": "cat packages/ts-gettext-extractor/package.json | jq '.optionalDependencies[]=\"'$npm_package_version'\"' > packages/ts-gettext-extractor/package.json && git add packages/ts-gettext-extractor/package.json",
     "version:cargo": "perl -i -pe 's/^version = \"[^\"]+\"/version = \"'$npm_package_version'\"/' Cargo.toml && cargo check && git add Cargo.*",
     "version:yarn-lock": "yarn && git add yarn.lock",
-    "bump": "npm version --force -m 'v%s' --git-tag-version=true"
+    "bump": "npm version --force -m 'v%s' --git-tag-version=true",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "husky": "^8.0.0"
   }
 }
