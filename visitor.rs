@@ -53,8 +53,19 @@ impl Visit for GettextVisitor<'_> {
             ..
         } = &call
         {
-            if let Expr::Ident(Ident { sym, .. }) = &expr.deref() {
-                match sym.as_str() {
+            let name = match &expr.deref() {
+                // object.method()
+                Expr::Member(MemberExpr {
+                    prop: MemberProp::Ident(Ident { sym, .. }),
+                    ..
+                }) => Some(sym.as_str()),
+                // method()
+                Expr::Ident(Ident { sym, .. }) => Some(sym.as_str()),
+                _ => None,
+            };
+
+            if let Some(sym) = name {
+                match sym {
                     "__" | "gettext" => {
                         if let [ExprOrSpread { expr: expr1, .. }] = &args[..1] {
                             if let (Some(value1),) = (&extract_string_from_expr(expr1),) {
@@ -305,6 +316,38 @@ msgstr ""
 #: test.js:1
 msgid "Hello, world!"
 msgstr ""
+"#
+        );
+    }
+
+    #[test]
+    fn detects_object_method_calls() {
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse(
+            "test.js",
+            r#"
+i18n.__("Hello, world!");
+object.i18n.__n('Singular', 'Plural', 3);
+context.i18n[__]("Something else");
+"#,
+            Arc::clone(&pot),
+        );
+        assert_eq!(
+            pot.lock().unwrap().to_string(None).unwrap(),
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: test.js:2
+msgid "Hello, world!"
+msgstr ""
+
+#: test.js:3
+msgid "Singular"
+msgid_plural "Plural"
+msgstr[0] ""
+msgstr[1] ""
 "#
         );
     }
