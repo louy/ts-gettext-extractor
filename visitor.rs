@@ -53,8 +53,20 @@ impl Visit for GettextVisitor<'_> {
             ..
         } = &call
         {
-            if let Expr::Ident(Ident { sym, .. }) = &expr.deref() {
-                match sym.as_str() {
+            let symbol = match &expr.deref() {
+                Expr::Member(MemberExpr { prop, .. }) => {
+                    if let Some(Ident { sym, .. }) = prop.as_ident() {
+                        Some(sym.as_str())
+                    } else {
+                        None
+                    }
+                }
+                Expr::Ident(Ident { sym, .. }) => Some(sym.as_str()),
+                _ => None,
+            };
+
+            if let Some(sym) = symbol {
+                match sym {
                     "__" | "gettext" => {
                         if let [ExprOrSpread { expr: expr1, .. }] = &args[..1] {
                             if let (Some(value1),) = (&extract_string_from_expr(expr1),) {
@@ -303,6 +315,39 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: test.js:1
+msgid "Hello, world!"
+msgstr ""
+"#
+        );
+    }
+
+    #[test]
+    fn detects_object_call_message_with_no_context() {
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse(
+            "test.js",
+            r#"
+context.i18n.__("Hello, world!");
+i18n.__n('An interpolated %{string}', 'Many interpolated %{string}s', 3, { string: 'foo' });
+context.i18n[TestSymbol]("Something else"); // should not panic
+context.i18n[__]("Something else"); // should not count
+"#,
+            Arc::clone(&pot),
+        );
+        assert_eq!(
+            pot.lock().unwrap().to_string(None).unwrap(),
+            r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: test.js:3
+msgid "An interpolated %{string}"
+msgid_plural "Many interpolated %{string}s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: test.js:2
 msgid "Hello, world!"
 msgstr ""
 "#
