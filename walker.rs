@@ -52,16 +52,19 @@ pub fn parse_file(path: &Path, pot: Arc<Mutex<crate::pot::POT>>, references_rela
             Some("d.ts") => Syntax::Typescript(TsConfig {
                 tsx: false,
                 dts: true,
+                decorators: true,
                 ..Default::default()
             }),
             Some("ts") => Syntax::Typescript(TsConfig {
                 tsx: false,
                 dts: false,
+                decorators: true,
                 ..Default::default()
             }),
             Some("tsx") => Syntax::Typescript(TsConfig {
                 tsx: true,
                 dts: false,
+                decorators: true,
                 ..Default::default()
             }),
             Some("js") => Syntax::Es(Default::default()),

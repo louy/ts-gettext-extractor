@@ -264,6 +264,12 @@ impl Visit for GettextVisitor<'_> {
             }
         }
     }
+
+    fn visit_decorator(&mut self, n: &Decorator) {
+        n.visit_children_with(self);
+        // Decorators can contain expressions with gettext function calls
+        // The default visit_children_with will handle visiting the decorator's expression
+    }
 }
 
 fn format_reference(
@@ -488,6 +494,30 @@ msgid "Hello, world!"
 msgstr ""
 "#
         );
+    }
+
+    #[test]
+    fn detects_decorator_with_gettext() {
+        let pot = Arc::new(Mutex::new(crate::pot::POT::new(None)));
+        parse(
+            "decorator.ts",
+            r#"
+@Component({
+    title: __("My Component")
+})
+class MyComponent {}
+
+@Get(__("API endpoint"))
+class MyController {}
+"#,
+            Arc::clone(&pot),
+        );
+        let output = pot.lock().unwrap().to_string(None).unwrap();
+        // Check that both strings are present in the output
+        assert!(output.contains("msgid \"My Component\""));
+        assert!(output.contains("msgid \"API endpoint\""));
+        assert!(output.contains("#: decorator.ts:3"));
+        assert!(output.contains("#: decorator.ts:7"));
     }
 
     use swc_ecma_visit::VisitWith;
