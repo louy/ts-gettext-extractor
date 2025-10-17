@@ -1,3 +1,9 @@
+## [0.3.0](https://github.com/louy/ts-gettext-extractor/compare/v0.1.0...v0.3.0) (2025-10-17)
+
+### Features
+
+* add decorator support ([9186a59](https://github.com/louy/ts-gettext-extractor/commit/9186a595db154bd32ef231897dde25b4bf15ccc8))
+* add support for object members ([a2c8275](https://github.com/louy/ts-gettext-extractor/commit/a2c8275aac4f4e973ce35b6fd4f4082570c03c16))
 ## [0.2.0](https://github.com/louy/ts-gettext-extractor/compare/v0.1.0...v0.2.0) (2024-06-15)
 
 ### Features

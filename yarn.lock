@@ -1470,37 +1470,37 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-gettext-extractor-darwin-arm64@npm:0.2.0, ts-gettext-extractor-darwin-arm64@workspace:packages/ts-gettext-extractor-darwin-arm64":
+"ts-gettext-extractor-darwin-arm64@npm:0.3.0, ts-gettext-extractor-darwin-arm64@workspace:packages/ts-gettext-extractor-darwin-arm64":
   version: 0.0.0-use.local
   resolution: "ts-gettext-extractor-darwin-arm64@workspace:packages/ts-gettext-extractor-darwin-arm64"
   languageName: unknown
   linkType: soft
 
-"ts-gettext-extractor-darwin-x64@npm:0.2.0, ts-gettext-extractor-darwin-x64@workspace:packages/ts-gettext-extractor-darwin-x64":
+"ts-gettext-extractor-darwin-x64@npm:0.3.0, ts-gettext-extractor-darwin-x64@workspace:packages/ts-gettext-extractor-darwin-x64":
   version: 0.0.0-use.local
   resolution: "ts-gettext-extractor-darwin-x64@workspace:packages/ts-gettext-extractor-darwin-x64"
   languageName: unknown
   linkType: soft
 
-"ts-gettext-extractor-linux-arm64-gnu@npm:0.2.0, ts-gettext-extractor-linux-arm64-gnu@workspace:packages/ts-gettext-extractor-linux-arm64-gnu":
+"ts-gettext-extractor-linux-arm64-gnu@npm:0.3.0, ts-gettext-extractor-linux-arm64-gnu@workspace:packages/ts-gettext-extractor-linux-arm64-gnu":
   version: 0.0.0-use.local
   resolution: "ts-gettext-extractor-linux-arm64-gnu@workspace:packages/ts-gettext-extractor-linux-arm64-gnu"
   languageName: unknown
   linkType: soft
 
-"ts-gettext-extractor-linux-arm64-musl@npm:0.2.0, ts-gettext-extractor-linux-arm64-musl@workspace:packages/ts-gettext-extractor-linux-arm64-musl":
+"ts-gettext-extractor-linux-arm64-musl@npm:0.3.0, ts-gettext-extractor-linux-arm64-musl@workspace:packages/ts-gettext-extractor-linux-arm64-musl":
   version: 0.0.0-use.local
   resolution: "ts-gettext-extractor-linux-arm64-musl@workspace:packages/ts-gettext-extractor-linux-arm64-musl"
   languageName: unknown
   linkType: soft
 
-"ts-gettext-extractor-linux-x64-gnu@npm:0.2.0, ts-gettext-extractor-linux-x64-gnu@workspace:packages/ts-gettext-extractor-linux-x64-gnu":
+"ts-gettext-extractor-linux-x64-gnu@npm:0.3.0, ts-gettext-extractor-linux-x64-gnu@workspace:packages/ts-gettext-extractor-linux-x64-gnu":
   version: 0.0.0-use.local
   resolution: "ts-gettext-extractor-linux-x64-gnu@workspace:packages/ts-gettext-extractor-linux-x64-gnu"
   languageName: unknown
   linkType: soft
 
-"ts-gettext-extractor-linux-x64-musl@npm:0.2.0, ts-gettext-extractor-linux-x64-musl@workspace:packages/ts-gettext-extractor-linux-x64-musl":
+"ts-gettext-extractor-linux-x64-musl@npm:0.3.0, ts-gettext-extractor-linux-x64-musl@workspace:packages/ts-gettext-extractor-linux-x64-musl":
   version: 0.0.0-use.local
   resolution: "ts-gettext-extractor-linux-x64-musl@workspace:packages/ts-gettext-extractor-linux-x64-musl"
   languageName: unknown
@@ -1510,12 +1510,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ts-gettext-extractor@workspace:packages/ts-gettext-extractor"
   dependencies:
-    ts-gettext-extractor-darwin-arm64: "npm:0.2.0"
-    ts-gettext-extractor-darwin-x64: "npm:0.2.0"
-    ts-gettext-extractor-linux-arm64-gnu: "npm:0.2.0"
-    ts-gettext-extractor-linux-arm64-musl: "npm:0.2.0"
-    ts-gettext-extractor-linux-x64-gnu: "npm:0.2.0"
-    ts-gettext-extractor-linux-x64-musl: "npm:0.2.0"
+    ts-gettext-extractor-darwin-arm64: "npm:0.3.0"
+    ts-gettext-extractor-darwin-x64: "npm:0.3.0"
+    ts-gettext-extractor-linux-arm64-gnu: "npm:0.3.0"
+    ts-gettext-extractor-linux-arm64-musl: "npm:0.3.0"
+    ts-gettext-extractor-linux-x64-gnu: "npm:0.3.0"
+    ts-gettext-extractor-linux-x64-musl: "npm:0.3.0"
   dependenciesMeta:
     ts-gettext-extractor-darwin-arm64:
       optional: true
