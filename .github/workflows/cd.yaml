@@ -168,6 +168,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set release notes from changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF:11}"
+          awk -v ver="$version" '
+            $0 ~ "^## \\[" ver "\\]" {found=1; next}
+            /^## \[/ {if (found) exit}
+            found {print}
+          ' CHANGELOG.md > release-notes.md
+          if [ -s release-notes.md ]; then
+            gh release edit "v$version" --notes-file release-notes.md
+          fi
       - run: corepack enable
       - name: Install node
         uses: actions/setup-node@v4
