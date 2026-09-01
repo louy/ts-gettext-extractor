@@ -148,18 +148,16 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           registry-url: "https://registry.npmjs.org"
       - name: Publish to NPM
         run: |
           cd packages/ts-gettext-extractor-${{ env.NAME }}/
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
-            npm publish --provenance --access public --tag rc
+            npm publish --access public --tag rc
           else
-            npm publish --provenance --access public
+            npm publish --access public
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-main-package:
     needs: publish-binary
@@ -174,7 +172,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           registry-url: "https://registry.npmjs.org"
       - run: |
           cp README.md packages/ts-gettext-extractor/
@@ -182,12 +180,10 @@ jobs:
         run: |
           cd packages/ts-gettext-extractor
           if [ ${{ contains(github.ref, '-') }} = "true" ]; then
-            npm publish --provenance --access public --tag rc
+            npm publish --access public --tag rc
           else
-            npm publish --provenance --access public
+            npm publish --access public
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   
   publish-crate:
     runs-on: ubuntu-latest
