@@ -2,14 +2,34 @@
 ![NPM Version](https://img.shields.io/npm/v/ts-gettext-extractor?style=for-the-badge)
 ![Crates.io Version](https://img.shields.io/crates/v/ts-gettext-extractor?style=for-the-badge)
 
-A command line utility to generate Gettext template files (`.pot`) from Javascript/Typescript code.
+A command line utility to generate Gettext template files (`.pot`) from Javascript/Typescript/Astro code.
 
 Uses SWC to parse JS files.
 
 ## Supported files
 `.js`, `.jsx`, `.ts`, `.tsx` and `.astro` files are scanned.
 
-In `.astro` files strings are extracted from the frontmatter, from `{...}` expressions in the markup, and from `<script>` blocks. `<style>` blocks are ignored.
+### Astro files
+An `.astro` file is rewritten into TSX before parsing, so all the functions listed below work in every place JavaScript can appear in a component:
+
+- the TypeScript frontmatter between the `---` fences,
+- `{...}` expressions in the markup, both as children and in attribute values,
+- `<script>` blocks, unless their tag marks them as something other than JavaScript.
+
+`<style>` blocks and the markup itself are ignored.
+
+```astro
+---
+const heading = __('Deals near you');
+const count = __n('%n offer', '%n offers', offers);
+---
+<Layout title={__('Deals')}>
+  <h1>{heading}</h1>
+  <a href="/pricing" aria-label={__p('nav', 'See pricing')}>{__('See pricing')}</a>
+</Layout>
+```
+
+The rewrite preserves line numbers, so references in the POT file point at the original `.astro` source.
 
 ## Usage
 See help for more details
