@@ -9,6 +9,7 @@
     "arm64"
   ],
   "repository": {
-    "url": "https://github.com/louy/ts-gettext-extractor"
+    "type": "git",
+    "url": "git+https://github.com/louy/ts-gettext-extractor.git"
   }
 }
