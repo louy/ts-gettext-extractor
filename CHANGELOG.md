@@ -1,3 +1,4 @@
+## [0.4.2](https://github.com/louy/ts-gettext-extractor/compare/v0.4.1...v0.4.2) (2026-09-01)
 ## [0.4.1](https://github.com/louy/ts-gettext-extractor/compare/v0.4.0...v0.4.1) (2026-09-01)
 
 ### Bug Fixes
