@@ -1,3 +1,9 @@
+## [0.4.1](https://github.com/louy/ts-gettext-extractor/compare/v0.4.0...v0.4.1) (2026-09-01)
+
+### Bug Fixes
+
+* **deps:** update js-yaml, handlebars and conventional-changelog git-client ([07be431](https://github.com/louy/ts-gettext-extractor/commit/07be431b53ff6c03280b5e8df4732b746bb2f179))
+* **deps:** update rand and url/idna in Cargo.lock ([998ea35](https://github.com/louy/ts-gettext-extractor/commit/998ea3589c729d19fe3bbb3448bd1474ba7e1a60))
 ## [0.4.0](https://github.com/louy/ts-gettext-extractor/compare/v0.3.1...v0.4.0) (2026-09-01)
 
 ### Features
