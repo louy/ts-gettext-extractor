@@ -1,3 +1,8 @@
+## [0.4.0](https://github.com/louy/ts-gettext-extractor/compare/v0.3.1...v0.4.0) (2026-09-01)
+
+### Features
+
+* add astro support ([1d2e3b6](https://github.com/louy/ts-gettext-extractor/commit/1d2e3b6752d64f7ff7f0af3afa506da51828e11d))
 ## [0.3.1](https://github.com/louy/ts-gettext-extractor/compare/v0.3.0...v0.3.1) (2025-10-30)
 ## [0.3.0](https://github.com/louy/ts-gettext-extractor/compare/v0.1.0...v0.3.0) (2025-10-17)
 
