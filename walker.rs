@@ -26,7 +26,11 @@ pub fn find_ts_files(
                     } else {
                         // Filter out all files with extensions other than `ts` or `tsx` or `js` or `jsx`
                         entry.path().extension().map_or(false, |ext| {
-                            ext == "ts" || ext == "tsx" || ext == "js" || ext == "jsx"
+                            ext == "ts"
+                                || ext == "tsx"
+                                || ext == "js"
+                                || ext == "jsx"
+                                || ext == "astro"
                         })
                     }
                 })
@@ -40,38 +44,58 @@ use std::sync::{Arc, Mutex};
 use swc_common::sync::Lrc;
 use swc_common::{
     errors::{ColorConfig, Handler},
-    SourceMap,
+    FileName, SourceMap,
 };
 use swc_ecma_parser::{lexer::Lexer, EsConfig, Parser, StringInput, Syntax, TsConfig};
 use swc_ecma_visit::VisitWith;
 
 /// Extract gettext strings from a source file
 pub fn parse_file(path: &Path, pot: Arc<Mutex<crate::pot::POT>>, references_relative_to: &PathBuf) {
-    let syntax = match path.extension() {
+    // Astro files aren't valid TSX, so they are rewritten before being parsed
+    let (syntax, rewritten) = match path.extension() {
         Some(os_str) => match os_str.to_str() {
-            Some("d.ts") => Syntax::Typescript(TsConfig {
-                tsx: false,
-                dts: true,
-                decorators: true,
-                ..Default::default()
-            }),
-            Some("ts") => Syntax::Typescript(TsConfig {
-                tsx: false,
-                dts: false,
-                decorators: true,
-                ..Default::default()
-            }),
-            Some("tsx") => Syntax::Typescript(TsConfig {
-                tsx: true,
-                dts: false,
-                decorators: true,
-                ..Default::default()
-            }),
-            Some("js") => Syntax::Es(Default::default()),
-            Some("jsx") => Syntax::Es(EsConfig {
-                jsx: true,
-                ..Default::default()
-            }),
+            Some("d.ts") => (
+                Syntax::Typescript(TsConfig {
+                    tsx: false,
+                    dts: true,
+                    decorators: true,
+                    ..Default::default()
+                }),
+                None,
+            ),
+            Some("ts") => (
+                Syntax::Typescript(TsConfig {
+                    tsx: false,
+                    dts: false,
+                    decorators: true,
+                    ..Default::default()
+                }),
+                None,
+            ),
+            Some("tsx") => (
+                Syntax::Typescript(TsConfig {
+                    tsx: true,
+                    dts: false,
+                    decorators: true,
+                    ..Default::default()
+                }),
+                None,
+            ),
+            Some("js") => (Syntax::Es(Default::default()), None),
+            Some("jsx") => (
+                Syntax::Es(EsConfig {
+                    jsx: true,
+                    ..Default::default()
+                }),
+                None,
+            ),
+            Some("astro") => {
+                let source = std::fs::read_to_string(path).expect("Failed to load file");
+                (
+                    crate::astro::syntax(),
+                    Some(crate::astro::transform(&source)),
+                )
+            }
             _ => panic!("Unknown extension"),
         },
         _ => panic!("Unknown extension"),
@@ -81,7 +105,10 @@ pub fn parse_file(path: &Path, pot: Arc<Mutex<crate::pot::POT>>, references_rela
     let handler = Handler::with_tty_emitter(ColorConfig::Auto, true, false, Some(cm.clone()));
     let comments: swc_common::comments::SingleThreadedComments = Default::default();
 
-    let fm = cm.load_file(path).expect("Failed to load file");
+    let fm = match rewritten {
+        Some(source) => cm.new_source_file(FileName::Real(path.to_path_buf()), source),
+        None => cm.load_file(path).expect("Failed to load file"),
+    };
     let lexer = Lexer::new(
         syntax,
         // EsVersion defaults to es5

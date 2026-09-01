@@ -6,11 +6,16 @@ A command line utility to generate Gettext template files (`.pot`) from Javascri
 
 Uses SWC to parse JS files.
 
+## Supported files
+`.js`, `.jsx`, `.ts`, `.tsx` and `.astro` files are scanned.
+
+In `.astro` files strings are extracted from the frontmatter, from `{...}` expressions in the markup, and from `<script>` blocks. `<style>` blocks are ignored.
+
 ## Usage
 See help for more details
 ```console
 $ ts-gettext-extractor --help
-Generate Gettext template files from Javascript/Typescript code
+Generate Gettext template files from Javascript/Typescript/Astro code
 
 Usage: ts-gettext-extractor [OPTIONS] --output-folder <OUTPUT_FOLDER>
 

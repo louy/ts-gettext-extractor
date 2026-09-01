@@ -1,0 +1,46 @@
+---
+// src/pages/[locale]/example.astro
+import Layout from '../../layouts/Layout.astro';
+import { LOCALES, MARKETS } from '../../i18n/markets';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({ params: { locale } }));
+}
+
+const { country } = Astro.locals;
+const offers = 12;
+
+// gettext in frontmatter TS
+const heading = __('Deals near you');
+const subtitle = __p('page', 'Two-for-one, every day');
+const market = MARKETS[country].name();
+const count = __n('%n offer', '%n offers', offers);
+const tagged = __`Save now`;
+---
+
+<!-- gettext in template markup -->
+<Layout title={__('Deals')}>
+  <h1>{heading}</h1>
+  <p>{subtitle}</p>
+  <p>{market} — {count}</p>
+
+  <a href={Astro.locals.href('/pricing')} aria-label={__p('nav', 'See pricing')}>
+    {__('See pricing')}
+  </a>
+
+  <button type="button" data-label={__`Save now`}>{tagged}</button>
+
+  <ul>
+    {['food', 'wellness'].map((slug) => <li>{__d('categories', slug)}</li>)}
+  </ul>
+</Layout>
+
+<style>
+  h1 {
+    font-size: 2rem;
+  }
+</style>
+
+<script>
+  console.log('no globals in a client script');
+</script>

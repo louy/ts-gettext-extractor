@@ -10,6 +10,12 @@ msgid ""
 "that\""
 msgstr ""
 
+#: src/pages/[locale]/example.astro:17
+msgid "%n offer"
+msgid_plural "%n offers"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/test.copy.ts:10
 #: src/test.ts:10
 msgid "'Single quote'"
@@ -18,6 +24,19 @@ msgstr ""
 #: src/test.copy.ts:14
 #: src/test.ts:14
 msgid "And a new line!"
+msgstr ""
+
+#: src/pages/[locale]/example.astro:22
+msgid "Deals"
+msgstr ""
+
+#: src/pages/[locale]/example.astro:14
+msgid "Deals near you"
+msgstr ""
+
+#: src/pages/[locale]/example.astro:18
+#: src/pages/[locale]/example.astro:31
+msgid "Save now"
 msgstr ""
 
 #: src/index.jsx:12
@@ -36,6 +55,10 @@ msgid ""
 "eum fugiat quo voluptas nulla pariatur? "
 msgstr ""
 
+#: src/pages/[locale]/example.astro:28
+msgid "See pricing"
+msgstr ""
+
 #: src/test.copy.ts:7
 #: src/test.ts:7
 msgid "Test backticks"
@@ -44,6 +67,16 @@ msgstr ""
 #: src/test.copy.ts:8
 #: src/test.ts:8
 msgid "Test backticks with __d"
+msgstr ""
+
+#: src/pages/[locale]/example.astro:27
+msgctxt "nav"
+msgid "See pricing"
+msgstr ""
+
+#: src/pages/[locale]/example.astro:15
+msgctxt "page"
+msgid "Two-for-one, every day"
 msgstr ""
 
 #: src/index.jsx:9
