@@ -10,6 +10,17 @@ msgid ""
 "that\""
 msgstr ""
 
+#: src/test.copy.ts:26
+#: src/test.ts:26
+msgid ""
+"%d line\n"
+"break"
+msgid_plural ""
+"%d line\n"
+"breaks"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/pages/[locale]/example.astro:17
 msgid "%n offer"
 msgid_plural "%n offers"
@@ -21,12 +32,34 @@ msgstr[1] ""
 msgid "'Single quote'"
 msgstr ""
 
-#: src/test.copy.ts:14
-#: src/test.ts:14
-msgid "And a new line!"
+#: src/pages/[locale]/example.astro:21
+msgid "A literal \\n in the frontmatter"
 msgstr ""
 
-#: src/pages/[locale]/example.astro:22
+#: src/pages/[locale]/example.astro:43
+msgid "A literal \\n in the markup"
+msgstr ""
+
+#: src/test.copy.ts:30
+#: src/test.ts:30
+msgid "A literal \\n is not a line break"
+msgstr ""
+
+#: src/test.copy.ts:21
+#: src/test.ts:21
+msgid ""
+"A multi-line string\n"
+"spanning two lines"
+msgstr ""
+
+#: src/test.copy.ts:14
+#: src/test.ts:14
+msgid ""
+"And a\n"
+"new line!"
+msgstr ""
+
+#: src/pages/[locale]/example.astro:25
 msgid "Deals"
 msgstr ""
 
@@ -35,7 +68,7 @@ msgid "Deals near you"
 msgstr ""
 
 #: src/pages/[locale]/example.astro:18
-#: src/pages/[locale]/example.astro:31
+#: src/pages/[locale]/example.astro:34
 msgid "Save now"
 msgstr ""
 
@@ -55,7 +88,7 @@ msgid ""
 "eum fugiat quo voluptas nulla pariatur? "
 msgstr ""
 
-#: src/pages/[locale]/example.astro:28
+#: src/pages/[locale]/example.astro:31
 msgid "See pricing"
 msgstr ""
 
@@ -69,7 +102,27 @@ msgstr ""
 msgid "Test backticks with __d"
 msgstr ""
 
-#: src/pages/[locale]/example.astro:27
+#: src/pages/[locale]/example.astro:19
+msgid ""
+"Two lines in\n"
+"the frontmatter"
+msgstr ""
+
+#: src/pages/[locale]/example.astro:40
+msgid ""
+"Two lines in\n"
+"the markup"
+msgstr ""
+
+#: src/test.copy.ts:24
+#: src/test.ts:24
+msgctxt ""
+"A context\n"
+"with a new line"
+msgid "A string with a multi-line context"
+msgstr ""
+
+#: src/pages/[locale]/example.astro:30
 msgctxt "nav"
 msgid "See pricing"
 msgstr ""

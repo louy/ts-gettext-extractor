@@ -67,6 +67,24 @@ Options:
 
 One tagged template literal is supported, which is `__` with no variables. E.g. `` __`My string` ``
 
+## Line breaks
+
+Line breaks inside a string are kept and written as `\n` escapes, so the `msgid` matches the string the runtime looks up. Strings that span several lines are split over one PO line per line break:
+
+```js
+__(`A multi-line string
+spanning two lines`);
+```
+
+```po
+msgid ""
+"A multi-line string\n"
+"spanning two lines"
+msgstr ""
+```
+
+The same applies to contexts and plural forms. Comments keep their line breaks too, with each line getting its own comment marker.
+
 ## Metadata
 
 This library produces a few metadata in the POT files as below.

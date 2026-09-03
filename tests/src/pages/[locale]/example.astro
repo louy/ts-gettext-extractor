@@ -16,6 +16,9 @@ const subtitle = __p('page', 'Two-for-one, every day');
 const market = MARKETS[country].name();
 const count = __n('%n offer', '%n offers', offers);
 const tagged = __`Save now`;
+const multiline = __(`Two lines in
+the frontmatter`);
+const escaped = __('A literal \\n in the frontmatter');
 ---
 
 <!-- gettext in template markup -->
@@ -33,6 +36,11 @@ const tagged = __`Save now`;
   <ul>
     {['food', 'wellness'].map((slug) => <li>{__d('categories', slug)}</li>)}
   </ul>
+
+  <p>{__(`Two lines in
+the markup`)}</p>
+
+  <p>{__('A literal \\n in the markup')}</p>
 </Layout>
 
 <style>

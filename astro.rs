@@ -408,6 +408,41 @@ mod tests {
     }
 
     #[test]
+    fn keeps_multiline_strings_in_expressions() {
+        let source = "<p>{__(`Two lines in\nthe markup`)}</p>\n";
+        let transformed = transform(source);
+        assert_eq!(transformed, "   {__(`Two lines in\nthe markup`)}    \n");
+        assert_eq!(source.lines().count(), transformed.lines().count());
+        assert_parses(&transformed);
+    }
+
+    #[test]
+    fn keeps_escaped_quotes_in_expressions() {
+        let source = "<p>{__('It\\'s here }')}</p>\n";
+        let transformed = transform(source);
+        assert_eq!(transformed, "   {__('It\\'s here }')}    \n");
+        assert_parses(&transformed);
+    }
+
+    #[test]
+    fn counts_braces_past_escapes_and_line_breaks() {
+        // Braces are counted for the expressions the parser rejects, so the
+        // counting has to honour escapes and line breaks itself
+        let escaped = "{__('It\\'s }')} rest";
+        assert_eq!(
+            &escaped[..match_braces(escaped).expect("a matching brace")],
+            "{__('It\\'s }')}"
+        );
+        let multiline = "{__(`a }\nb`)} rest";
+        assert_eq!(
+            &multiline[..match_braces(multiline).expect("a matching brace")],
+            "{__(`a }\nb`)}"
+        );
+        // A line break in a quoted string means the braces can't be trusted
+        assert_eq!(match_braces("{__('a\nb')}"), None);
+    }
+
+    #[test]
     fn preserves_line_numbers() {
         let source = "---\n\nconst a = 1;\n---\n\n<p>\n  {__('Hi')}\n</p>\n";
         let transformed = transform(source);
