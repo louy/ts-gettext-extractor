@@ -1,3 +1,16 @@
+## [0.5.0](https://github.com/louy/ts-gettext-extractor/compare/v0.4.2...v0.5.0) (2026-09-03)
+
+### ⚠ BREAKING CHANGES
+
+* msgids of strings containing a line break or a backslash change, so existing catalogues need `msgmerge --fuzzy-matching` to carry their translations over.
+
+### Features
+
+* keep line breaks in extracted strings ([f6d85e4](https://github.com/louy/ts-gettext-extractor/commit/f6d85e44a8111acd31d90287ed9741ef11396a4b))
+
+### Bug Fixes
+
+* use normalized repository field in package.json ([99ebe5d](https://github.com/louy/ts-gettext-extractor/commit/99ebe5d202c2aa9e19afff45f3406bf8d168952d))
 ## [0.4.2](https://github.com/louy/ts-gettext-extractor/compare/v0.4.1...v0.4.2) (2026-09-01)
 ## [0.4.1](https://github.com/louy/ts-gettext-extractor/compare/v0.4.0...v0.4.1) (2026-09-01)
 
