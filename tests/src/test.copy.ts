@@ -17,3 +17,14 @@ new line!`;
 
 __dp("duplicates", "Fancy context", "Duplicate string");
 __dp("duplicates", "Fancy context", "Duplicate string");
+
+__(`A multi-line string
+spanning two lines`);
+
+__p("A context\nwith a new line", "A string with a multi-line context");
+
+__n(`%d line
+break`, `%d line
+breaks`, 2);
+
+__("A literal \\n is not a line break");

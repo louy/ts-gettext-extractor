@@ -6,11 +6,12 @@ use std::{
     time::Duration,
 };
 
+mod astro;
 mod pot;
 mod visitor;
 mod walker;
 
-/// Generate Gettext template files from Javascript/Typescript code.
+/// Generate Gettext template files from Javascript/Typescript/Astro code.
 #[derive(Parser)]
 struct Cli {
     /// A list of patterns to exclude

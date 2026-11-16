@@ -58,12 +58,12 @@ jobs:
           #   }
           - {
               NAME: darwin-x64,
-              OS: macos-12,
+              OS: macos-15,
               TARGET: x86_64-apple-darwin,
             }
           - {
               NAME: darwin-arm64,
-              OS: macos-12,
+              OS: macos-15,
               TARGET: aarch64-apple-darwin,
             }
     env:
@@ -165,13 +165,17 @@ jobs:
       - name: Publish to NPM
         run: |
           cd packages/ts-gettext-extractor-${{ env.NAME }}/
-          if [ ${{ contains(github.ref, '-') }} = "true" ]; then
-            npm publish --provenance --access public --tag rc
-          else
-            npm publish --provenance --access public
+          name=$(jq -r .name package.json)
+          version=$(jq -r .version package.json)
+          if [ "$(npm view "${name}@${version}" version 2>/dev/null)" = "$version" ]; then
+            echo "${name}@${version} is already published, skipping"
+            exit 0
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          if [ ${{ contains(github.ref, '-') }} = "true" ]; then
+            npm publish --access public --tag rc
+          else
+            npm publish --access public
+          fi
 
   publish-main-package:
     needs: publish-binary
@@ -188,6 +192,19 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+      - name: Set release notes from changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF:11}"
+          awk -v ver="$version" '
+            $0 ~ "^## \\[" ver "\\]" {found=1; next}
+            /^## \[/ {if (found) exit}
+            found {print}
+          ' CHANGELOG.md > release-notes.md
+          if [ -s release-notes.md ]; then
+            gh release edit "v$version" --notes-file release-notes.md
+          fi
       - name: Setup mise
         uses: step-security/mise-action@6e96d2ffbc65c037f23c78818f2a339d6cf830f7 # v4.2.4
         with:
@@ -202,13 +219,17 @@ jobs:
       - name: Publish to NPM
         run: |
           cd packages/ts-gettext-extractor
-          if [ ${{ contains(github.ref, '-') }} = "true" ]; then
-            npm publish --provenance --access public --tag rc
-          else
-            npm publish --provenance --access public
+          name=$(jq -r .name package.json)
+          version=$(jq -r .version package.json)
+          if [ "$(npm view "${name}@${version}" version 2>/dev/null)" = "$version" ]; then
+            echo "${name}@${version} is already published, skipping"
+            exit 0
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          if [ ${{ contains(github.ref, '-') }} = "true" ]; then
+            npm publish --access public --tag rc
+          else
+            npm publish --access public
+          fi
   
   publish-crate:
     runs-on: ubuntu-latest
